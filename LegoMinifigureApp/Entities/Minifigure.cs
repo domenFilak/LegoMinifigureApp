@@ -1,0 +1,103 @@
+﻿using LegoMinifigureApp.Entities.Common;
+using LegoMinifigureApp.Entities.Enums;
+
+namespace LegoMinifigureApp.Entities
+{
+    public class Minifigure : IAuditable, ISoftDeletable
+    {
+        public int Id { get; private set; }
+
+        //description of the minifigure, editable
+        public string Name { get; set; } = null!;
+        public string BrickLinkId { get; set; } = null!;
+        public short? ReleaseYear { get; set; }
+        public MinifigureCondition Condition { get; set; }
+        public string? Description { get; set; }
+        public string? ImagePath { get; set; }
+        public int ThemeId { get; set; }
+        public Theme Theme { get; private set; } = null!;
+
+        //lifecycle, changed only through belonging methods
+        public MinifigureStatus Status { get; private set; } = MinifigureStatus.Owned;
+        public DateTime? StatusChangedAt { get; private set; }
+
+        //listing, meaningful while "owned" by me
+        public bool IsForSale { get; private set; }
+        public decimal? AskingPrice { get; private set; }
+        public bool IsForTrade { get; private set; }
+        public string? TradeNotes { get; private set; }
+
+        //audit fields, concurency
+        public DateTime CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedAt { get; set; }
+        public byte[] RowVersion { get; private set; } = null!;
+
+        public bool IsArchived => Status != MinifigureStatus.Owned;
+
+        public void ListForSale(decimal askingPrice)
+        {
+            EnsureOwned();
+            if (askingPrice <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(askingPrice), "Asking price must be greater than zero.");
+            }
+            
+            IsForSale = true;
+            AskingPrice = askingPrice;
+        }
+
+        public void RemoveFromSale()
+        {
+            IsForSale = false;
+            AskingPrice = null;
+        }
+
+        public void ListForTrade(string? tradeNotes)
+        {
+            EnsureOwned();
+            IsForTrade = true;
+            TradeNotes = string.IsNullOrWhiteSpace(tradeNotes) ? null : tradeNotes.Trim();
+        }
+
+        public void RemoveFromTrade()
+        {
+            IsForTrade = false;
+            TradeNotes = null;
+        }
+
+        public void Archive(MinifigureStatus newStatus, DateTime changedAtUtc)
+        {
+            if (newStatus == MinifigureStatus.Owned)
+            {
+                throw new ArgumentException("Use Restore() to return a figure to the collection.", nameof(newStatus));
+            }
+            
+            EnsureOwned();
+            RemoveFromSale();
+            RemoveFromTrade();
+            Status = newStatus;
+            StatusChangedAt = changedAtUtc;
+        }
+
+        public void Restore(DateTime changedAtUtc)
+        {
+            if (Status == MinifigureStatus.Owned)
+            {
+                return;
+            }
+
+            Status = MinifigureStatus.Owned;
+            StatusChangedAt = changedAtUtc;
+        }
+
+        private void EnsureOwned()
+        {
+            if (IsArchived)
+            {
+                throw new InvalidOperationException($"Minifigure {Id} is {Status} and cannot be listed.");
+            }   
+        }
+    }
+}
