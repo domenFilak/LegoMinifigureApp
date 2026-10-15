@@ -3,7 +3,7 @@ using LegoMinifigureApp.Entities.Enums;
 
 namespace LegoMinifigureApp.Entities
 {
-    public class Minifigure : IAuditable, ISoftDeletable
+    public class Minifigure : AuditableEntity
     {
         public int Id { get; private set; }
 
@@ -20,18 +20,12 @@ namespace LegoMinifigureApp.Entities
         //lifecycle, changed only through belonging methods
         public MinifigureStatus Status { get; private set; } = MinifigureStatus.Owned;
         public DateTime? StatusChangedAt { get; private set; }
-
-        //listing, meaningful while "owned" by me
         public bool IsForSale { get; private set; }
         public decimal? AskingPrice { get; private set; }
         public bool IsForTrade { get; private set; }
         public string? TradeNotes { get; private set; }
 
-        //audit fields, concurency
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
-        public bool IsDeleted { get; set; }
-        public DateTime? DeletedAt { get; set; }
+        //concurency
         public byte[] RowVersion { get; private set; } = null!;
 
         public bool IsArchived => Status != MinifigureStatus.Owned;
