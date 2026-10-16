@@ -172,7 +172,7 @@ namespace LegoMinifigureApp.Data.Migrations
 
                     b.HasIndex("ThemeId");
 
-                    b.ToTable("Minifigures", t =>
+                    b.ToTable("Minifigures", null, t =>
                         {
                             t.HasCheckConstraint("CK_Minifigures_AskingPrice", "([IsForSale] = 0 AND [AskingPrice] IS NULL) OR ([IsForSale] = 1 AND [AskingPrice] > 0)");
 
@@ -219,7 +219,7 @@ namespace LegoMinifigureApp.Data.Migrations
                         .IsUnique()
                         .HasFilter("[IsDeleted] = 0");
 
-                    b.ToTable("Themes", t =>
+                    b.ToTable("Themes", null, t =>
                         {
                             t.HasCheckConstraint("CK_Themes_DeletedAt", "([IsDeleted] = 0 AND [DeletedAt] IS NULL) OR ([IsDeleted] = 1 AND [DeletedAt] IS NOT NULL)");
                         });

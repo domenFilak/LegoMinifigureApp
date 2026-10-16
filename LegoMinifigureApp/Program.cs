@@ -2,6 +2,7 @@ using LegoMinifigureApp.Data;
 using LegoMinifigureApp.Data.Seeding;
 using LegoMinifigureApp.Entities;
 using LegoMinifigureApp.Services.Dashboard;
+using LegoMinifigureApp.Services.Themes;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,6 +38,7 @@ builder.Services.AddScoped<DatabaseSeeder>();
 
 //services
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IThemeService, ThemeService>();
 
 var app = builder.Build();
 

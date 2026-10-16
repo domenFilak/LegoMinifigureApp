@@ -12,7 +12,7 @@ namespace LegoMinifigureApp.Data.Configurations
 
             builder.Property(t => t.Name)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(Theme.NameMaxLength);
 
             //unique among non deleted themes
             builder.HasIndex(t => t.Name)
