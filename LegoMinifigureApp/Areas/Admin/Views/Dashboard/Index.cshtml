@@ -1,6 +1,76 @@
-﻿@{
+﻿@model DashboardViewModel
+
+@{
 	ViewData["Title"] = "Dashboard";
 }
 
-<h1 class="mb-4">Dashboard</h1>
-<p class="text-muted">Collection overview coming next.</p>
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="row g-4 mb-4">
+
+	<!--short summary of the current collection-->
+	<div class="col-lg-4">
+		<div class="card h-100 shadow-sm">
+			<div class="card-body">
+				<h2 class="h6 text-uppercase text-muted">Collection</h2>
+				<p class="display-5 fw-bold mb-0">@Model.OwnedCount</p>
+				<p class="text-muted">figures owned</p>
+
+				@if (Model.HasFigures)
+				{
+					<h3 class="h6 text-muted mt-3">Recently added</h3>
+					<div class="row g-2">
+						@foreach (var figure in Model.LatestFigures)
+						{
+							<div class="col-4 text-center">
+								<img src="@figure.ImageUrl" alt="@figure.Name" class="figure-thumb" />
+								<div class="small text-truncate mt-1" title="@figure.Name">@figure.Name</div>
+							</div>
+						}
+					</div>
+				}
+				else
+				{
+					<p class="mb-0">No figures yet – add your first one to get started.</p>
+				}
+			</div>
+		</div>
+	</div>
+
+	<!--for sale and for trade listings-->
+	<div class="col-lg-4">
+		<div class="card h-100 shadow-sm">
+			<div class="card-body">
+				<h2 class="h6 text-uppercase text-muted">Listings</h2>
+				<div class="row text-center mt-3">
+					<div class="col">
+						<p class="display-5 fw-bold mb-0">@Model.ForSaleCount</p>
+						<p class="text-muted mb-0">for sale</p>
+					</div>
+					<div class="col border-start">
+						<p class="display-5 fw-bold mb-0">@Model.ForTradeCount</p>
+						<p class="text-muted mb-0">for trade</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--minifigures that are gone (arvhived); so were sold or traded-->
+	<div class="col-lg-4">
+		<div class="card h-100 shadow-sm">
+			<div class="card-body">
+				<h2 class="h6 text-uppercase text-muted">Archive</h2>
+				<p class="display-5 fw-bold mb-0">@Model.ArchivedCount</p>
+				<p class="text-muted">figures archived</p>
+				<p class="mb-0">Sold: <strong>@Model.SoldCount</strong> · Traded: <strong>@Model.TradedCount</strong></p>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<div class="d-flex flex-wrap gap-2">
+	<button type="button" class="btn btn-primary" disabled>Add new minifigure</button>
+	<button type="button" class="btn btn-outline-secondary" disabled>Manage themes</button>
+</div>

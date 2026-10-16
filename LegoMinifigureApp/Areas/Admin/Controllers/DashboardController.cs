@@ -1,12 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using LegoMinifigureApp.Areas.Admin.ViewModels.Dashboard;
+using LegoMinifigureApp.Services.Dashboard;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LegoMinifigureApp.Areas.Admin.Controllers
 {
-    public class DashboardController : AdminControllerBase
+    public class DashboardController(IDashboardService _dashboardService) : AdminControllerBase
     {
-        public IActionResult Index()
+        public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
-            return View();
+            var summary = await _dashboardService.GetSummaryAsync(cancellationToken);
+            return View(DashboardViewModel.From(summary));
         }
     }
 }

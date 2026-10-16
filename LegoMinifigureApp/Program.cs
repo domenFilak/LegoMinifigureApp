@@ -1,6 +1,7 @@
 using LegoMinifigureApp.Data;
 using LegoMinifigureApp.Data.Seeding;
 using LegoMinifigureApp.Entities;
+using LegoMinifigureApp.Services.Dashboard;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,6 +34,9 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.Configure<AdminAccountOptions>(builder.Configuration.GetSection(AdminAccountOptions.SectionName));
 builder.Services.AddScoped<DatabaseSeeder>();
+
+//services
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 var app = builder.Build();
 
