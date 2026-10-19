@@ -1,0 +1,13 @@
+﻿@model ThemeFormViewModel
+
+@{
+	ViewData["Title"] = "Add theme";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<partial name="_ThemeForm" model="Model" />
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+}

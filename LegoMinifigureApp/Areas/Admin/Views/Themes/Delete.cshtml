@@ -1,0 +1,31 @@
+﻿@model ThemeSummaryViewModel
+
+@{
+	ViewData["Title"] = "Delete theme";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="row">
+	<div class="col-md-6 col-lg-5">
+		<div class="card shadow-sm">
+			<div class="card-body">
+				@if (Model.CanDelete)
+				{
+					<p>Are you sure you want to delete <strong>@Model.Name</strong>?</p>
+					<p class="text-muted small">It will disappear from the theme list and from the theme dropdown when adding figures.</p>
+
+					<form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+						<button type="submit" class="btn btn-danger">Delete</button>
+						<a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+					</form>
+				}
+				else
+				{
+					<p><strong>@Model.Name</strong> still has @Model.FigureCount figure(s) and can't be deleted.</p>
+					<a asp-action="Index" class="btn btn-outline-secondary">Back to themes</a>
+				}
+			</div>
+		</div>
+	</div>
+</div>
