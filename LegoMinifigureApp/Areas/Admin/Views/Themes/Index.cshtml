@@ -21,6 +21,7 @@ else
 				<thead class="table-light">
 					<tr>
 						<th>Name</th>
+						<th class="text-end">Created At</th>
 						<th class="text-end">Owned</th>
 						<th class="text-end">Archived</th>
 						<th class="text-end">Actions</th>
@@ -31,6 +32,9 @@ else
 					{
 						<tr>
 							<td>@theme.Name</td>
+							<td class="text-end">
+								<time class="utc-time">@theme.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ")</time>
+							</td>
 							<td class="text-end">@theme.OwnedCount</td>
 							<td class="text-end">@theme.ArchivedCount</td>
 							<td class="text-end text-nowrap">
@@ -55,3 +59,15 @@ else
 		</div>
 	</div>
 }
+
+<script>
+	document.querySelectorAll('.utc-time').forEach(el => {
+		el.textContent = new Date(el.textContent).toLocaleString([], {
+			year: 'numeric',
+			month: '2-digit',
+			day: '2-digit',
+			hour: '2-digit',
+			minute: '2-digit'
+		});
+	});
+</script>

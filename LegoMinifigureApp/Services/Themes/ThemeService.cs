@@ -16,6 +16,7 @@ namespace LegoMinifigureApp.Services.Themes
                 .Select(t => new ThemeDto(
                     t.Id,
                     t.Name,
+                    t.CreatedAt,
                     t.Minifigures.Count(m => m.Status == MinifigureStatus.Owned),
                     t.Minifigures.Count(m => m.Status != MinifigureStatus.Owned)))
                 .ToListAsync(cancellationToken);
@@ -28,6 +29,7 @@ namespace LegoMinifigureApp.Services.Themes
                 .Select(t => new ThemeDto(
                     t.Id,
                     t.Name,
+                    t.CreatedAt,
                     t.Minifigures.Count(m => m.Status == MinifigureStatus.Owned),
                     t.Minifigures.Count(m => m.Status != MinifigureStatus.Owned)))
                 .FirstOrDefaultAsync(cancellationToken);

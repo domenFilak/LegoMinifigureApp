@@ -6,6 +6,7 @@ namespace LegoMinifigureApp.Areas.Admin.ViewModels.Themes
     {
         public int Id { get; init; }
         public string Name { get; init; } = string.Empty;
+        public DateTime CreatedAt { get; init; }
         public int OwnedCount { get; init; }
         public int ArchivedCount { get; init; }
 
@@ -18,6 +19,7 @@ namespace LegoMinifigureApp.Areas.Admin.ViewModels.Themes
             {
                 Id = dto.Id,
                 Name = dto.Name,
+                CreatedAt = dto.CreatedAt,
                 OwnedCount = dto.OwnedCount,
                 ArchivedCount = dto.ArchivedCount
             };
