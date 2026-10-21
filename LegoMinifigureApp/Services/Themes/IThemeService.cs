@@ -10,5 +10,6 @@ namespace LegoMinifigureApp.Services.Themes
         Task<Result> CreateAsync(string name, CancellationToken cancellationToken = default);
         Task<Result> RenameAsync(int id, string name, CancellationToken cancellationToken = default);
         Task<Result> DeleteAsync(int id, CancellationToken cancellationToken = default);
+        Task<IReadOnlyList<ThemeOptionDto>> GetOptionsAsync(CancellationToken cancellationToken = default);
     }
 }

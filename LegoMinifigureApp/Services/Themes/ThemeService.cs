@@ -114,6 +114,14 @@ namespace LegoMinifigureApp.Services.Themes
             return Result.Success();
         }
 
+        public async Task<IReadOnlyList<ThemeOptionDto>> GetOptionsAsync(CancellationToken cancellationToken = default)
+        {
+            return await db.Themes
+                .OrderBy(t => t.Name)
+                .Select(t => new ThemeOptionDto(t.Id, t.Name))
+                .ToListAsync(cancellationToken);
+        }
+
         private static string NormalizeName(string? name)
         {
             return name?.Trim() ?? string.Empty;
