@@ -2,10 +2,10 @@
 
 namespace LegoMinifigureApp.Services.Common
 {
-    public sealed record Error(ErrorType Type, string Message)
+    public sealed record Error(ErrorType Type, string Message, string? Field = null)
     {
-        public static Error Validation(string message) => new(ErrorType.Validation, message);
+        public static Error Validation(string message, string? field = null) => new(ErrorType.Validation, message, field);
         public static Error NotFound(string message) => new(ErrorType.NotFound, message);
-        public static Error Conflict(string message) => new(ErrorType.Conflict, message);
+        public static Error Conflict(string message, string? field = null) => new(ErrorType.Conflict, message, field);
     }
 }

@@ -5,8 +5,14 @@ namespace LegoMinifigureApp.Entities
 {
     public class Minifigure : AuditableEntity
     {
-        public int Id { get; private set; }
+        public const int NameMaxLength = 100;
+        public const int BrickLinkIdMaxLength = 20;
+        public const int DescriptionMaxLength = 2000;
+        public const int ImagePathMaxLength = 260;
+        public const short FirstReleaseYear = 1978;
+        public const int ReleaseYearMaxYearsAhead = 2;
 
+        public int Id { get; private set; }
         //description of the minifigure, editable
         public string Name { get; set; } = null!;
         public string BrickLinkId { get; set; } = null!;

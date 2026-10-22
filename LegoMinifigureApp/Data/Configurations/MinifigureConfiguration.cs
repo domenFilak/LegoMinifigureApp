@@ -11,10 +11,10 @@ namespace LegoMinifigureApp.Data.Configurations
             builder.HasKey(m => m.Id);
 
             //descriptive data
-            builder.Property(m => m.Name).IsRequired().HasMaxLength(100);
-            builder.Property(m => m.BrickLinkId).IsRequired().HasMaxLength(20);
-            builder.Property(m => m.Description).HasMaxLength(2000);
-            builder.Property(m => m.ImagePath).HasMaxLength(260);
+            builder.Property(m => m.Name).IsRequired().HasMaxLength(Minifigure.NameMaxLength);
+            builder.Property(m => m.BrickLinkId).IsRequired().HasMaxLength(Minifigure.BrickLinkIdMaxLength);
+            builder.Property(m => m.Description).HasMaxLength(Minifigure.DescriptionMaxLength);
+            builder.Property(m => m.ImagePath).HasMaxLength(Minifigure.ImagePathMaxLength);
 
             builder.Property(m => m.Condition)
                 .HasConversion<string>()
