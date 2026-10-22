@@ -1,0 +1,13 @@
+﻿@model MinifigureFormViewModel
+
+@{
+	ViewData["Title"] = "Add minifigure";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<partial name="_MinifigureForm" model="Model" />
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+}

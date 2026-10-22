@@ -6,7 +6,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
 	<h1 class="mb-0">@ViewData["Title"]</h1>
-	<button type="button" class="btn btn-primary" disabled>Add minifigure</button>
+	<a asp-action="Create" class="btn btn-primary">Add minifigure</a>
 </div>
 
 <!--filters section, GET form; values are put into URL-->
@@ -91,7 +91,7 @@ else
 								<time datetime="@UtcDates.ToIso(figure.CreatedAt)" data-local-time>@UtcDates.ToFallbackText(figure.CreatedAt)</time>
 							</td>
 							<td class="text-end">
-								<button type="button" class="btn btn-sm btn-outline-secondary" disabled>Manage</button>
+								<a asp-action="Edit" asp-route-id="@figure.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
 							</td>
 						</tr>
 					}

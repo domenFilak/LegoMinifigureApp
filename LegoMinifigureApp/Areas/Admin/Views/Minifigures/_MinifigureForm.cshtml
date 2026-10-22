@@ -1,0 +1,87 @@
+﻿@model MinifigureFormViewModel
+
+<form asp-action="@(Model.IsEdit ? "Edit" : "Create")" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
+
+	<input type="hidden" asp-for="RowVersion" />
+	<input type="hidden" asp-for="CurrentImageUrl" />
+
+	<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+	<div class="row g-4">
+		<!--minifigure details-->
+		<div class="col-lg-8">
+			<div class="card shadow-sm">
+				<div class="card-body">
+					<div class="row g-3">
+						<div class="col-md-8">
+							<label asp-for="Name" class="form-label"></label>
+							<input asp-for="Name" class="form-control" autofocus />
+							<span asp-validation-for="Name" class="text-danger"></span>
+						</div>
+						<div class="col-md-4">
+							<label asp-for="BrickLinkId" class="form-label"></label>
+							<input asp-for="BrickLinkId" class="form-control" placeholder="e.g. sw0450" />
+							<span asp-validation-for="BrickLinkId" class="text-danger"></span>
+						</div>
+						<div class="col-md-4">
+							<label asp-for="ThemeId" class="form-label"></label>
+							<select asp-for="ThemeId" asp-items="Model.ThemeOptions" class="form-select">
+								<option value="">Choose a theme…</option>
+							</select>
+							<span asp-validation-for="ThemeId" class="text-danger"></span>
+						</div>
+						<div class="col-md-4">
+							<label asp-for="Condition" class="form-label"></label>
+							<select asp-for="Condition" asp-items="Model.ConditionOptions" class="form-select">
+								<option value="">Choose a condition…</option>
+							</select>
+							<span asp-validation-for="Condition" class="text-danger"></span>
+						</div>
+						<div class="col-md-4">
+							<label asp-for="ReleaseYear" class="form-label"></label>
+							<input asp-for="ReleaseYear" class="form-control"
+								   min="@Model.MinReleaseYear" max="@Model.MaxReleaseYear" />
+							<span asp-validation-for="ReleaseYear" class="text-danger"></span>
+						</div>
+
+						<div class="col-12">
+							<label asp-for="Description" class="form-label"></label>
+							<textarea asp-for="Description" class="form-control" rows="5"></textarea>
+							<span asp-validation-for="Description" class="text-danger"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!--image-->
+		<div class="col-lg-4">
+			<div class="card shadow-sm">
+				<div class="card-body">
+					<h2 class="h6 text-uppercase text-muted">Image</h2>
+
+					@if (Model.HasCurrentImage)
+					{
+						<img src="@Model.CurrentImageUrl" alt="Current image of @Model.Name" class="figure-thumb mb-2" style="height: 160px;" />
+						<div class="form-check mb-3">
+							<input asp-for="RemoveImage" class="form-check-input" />
+							<label asp-for="RemoveImage" class="form-check-label"></label>
+						</div>
+					}
+
+					<label asp-for="Image" class="form-label">
+						@(Model.HasCurrentImage ? "Replace image" : "Upload image")
+					</label>
+					<input asp-for="Image" type="file" class="form-control" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" />
+					<div class="form-text">JPG, PNG or WebP, up to 5 MB.</div>
+					<span asp-validation-for="Image" class="text-danger"></span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="mt-4">
+		<button type="submit" class="btn btn-primary">@(Model.IsEdit ? "Save" : "Add minifigure")</button>
+		<a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+	</div>
+</form>
