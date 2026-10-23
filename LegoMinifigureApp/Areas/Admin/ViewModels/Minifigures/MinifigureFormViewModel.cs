@@ -66,7 +66,7 @@ namespace LegoMinifigureApp.Areas.Admin.ViewModels.Minifigures
             return new MinifigureFormViewModel
             {
                 Id = dto.Id,
-                RowVersion = Convert.ToBase64String(dto.RowVersion),
+                RowVersion = RowVersionText.Encode(dto.RowVersion),
                 Name = dto.Name,
                 BrickLinkId = dto.BrickLinkId,
                 ReleaseYear = dto.ReleaseYear,
@@ -109,19 +109,7 @@ namespace LegoMinifigureApp.Areas.Admin.ViewModels.Minifigures
 
         public byte[]? GetRowVersionBytes()
         {
-            if (string.IsNullOrEmpty(RowVersion))
-            {
-                return null;
-            }
-
-            try
-            {
-                return Convert.FromBase64String(RowVersion);
-            }
-            catch (FormatException)
-            {
-                return null; //someone tempered
-            }
+            return RowVersionText.TryDecode(RowVersion);
         }
     }
 }

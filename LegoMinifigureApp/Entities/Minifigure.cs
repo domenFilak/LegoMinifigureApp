@@ -11,6 +11,8 @@ namespace LegoMinifigureApp.Entities
         public const int ImagePathMaxLength = 260;
         public const short FirstReleaseYear = 1978;
         public const int ReleaseYearMaxYearsAhead = 2;
+        public const int TradeNotesMaxLength = 500;
+        public const int MaxAskingPrice = 10000;
 
         public int Id { get; private set; }
         //description of the minifigure, editable

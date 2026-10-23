@@ -156,14 +156,14 @@ namespace LegoMinifigureApp.Services.Minifigures
             return Result.Success();
         }
 
-        public async Task<Result> CreateAsync(MinifigureDetailsCommand command, CancellationToken cancellationToken = default)
+        public async Task<Result<int>> CreateAsync(MinifigureDetailsCommand command, CancellationToken cancellationToken = default)
         {
             var details = Normalize(command);
 
             var validationError = await ValidateAsync(details, cancellationToken);
             if (validationError is not null)
             {
-                return Result.Failure(validationError);
+                return Result<int>.Failure(validationError);
             }
 
             string? newImagePath = null;
@@ -189,8 +189,192 @@ namespace LegoMinifigureApp.Services.Minifigures
                 throw;
             }
 
+            return Result<int>.Success(figure.Id);
+        }
+
+        public async Task<MinifigureDetailsDto?> GetDetailsAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return await db.Minifigures
+                .Where(m => m.Id == id)
+                .Select(m => new MinifigureDetailsDto(
+                    m.Id,
+                    m.Name,
+                    m.BrickLinkId,
+                    m.Theme.Name,
+                    m.Condition,
+                    m.ReleaseYear,
+                    m.Description,
+                    m.ImagePath,
+                    m.Status,
+                    m.StatusChangedAt,
+                    m.IsForSale,
+                    m.AskingPrice,
+                    m.IsForTrade,
+                    m.TradeNotes,
+                    m.CreatedAt,
+                    m.UpdatedAt,
+                    m.RowVersion)
+                )
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public async Task<Result> ListForSaleAsync(int id, byte[] rowVersion, decimal askingPrice, CancellationToken cancellationToken = default)
+        {
+            var figure = await db.Minifigures.FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
+            if (figure is null)
+            {
+                return Result.Failure(MinifigureErrors.NotFound(id));
+            }
+
+            if (!figure.RowVersion.SequenceEqual(rowVersion))
+            {
+                return Result.Failure(MinifigureErrors.ConcurrencyConflict);
+            }
+
+            if (figure.IsArchived)
+            {
+                return Result.Failure(MinifigureErrors.NotOwned(figure.Status));
+            }
+
+            var price = decimal.Round(askingPrice, 2, MidpointRounding.AwayFromZero);
+
+            if (price <= 0)
+            {
+                return Result.Failure(MinifigureErrors.AskingPriceNotPositive);
+            }
+
+            if (price > Minifigure.MaxAskingPrice)
+            {
+                return Result.Failure(MinifigureErrors.AskingPriceTooHigh);
+            }
+
+            figure.ListForSale(price);
+
+            if (!db.ChangeTracker.HasChanges())
+            {
+                return Result.Success(); //if new price is same as before, just return success
+            }
+
+            figure.MarkUpdated(GetUtcNow());
+            db.Entry(figure).Property(m => m.RowVersion).OriginalValue = rowVersion;
+
+            try
+            {
+                await db.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return Result.Failure(MinifigureErrors.ConcurrencyConflict);
+            }
+
             return Result.Success();
         }
+
+        public async Task<Result> RemoveFromSaleAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var figure = await db.Minifigures.FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
+            if (figure is null)
+            {
+                return Result.Failure(MinifigureErrors.NotFound(id));
+            }
+
+            figure.RemoveFromSale();
+
+            if (!db.ChangeTracker.HasChanges())
+            {
+                return Result.Success(); //was not for sale from before as well, just return success
+            }
+
+            figure.MarkUpdated(GetUtcNow());
+
+            try
+            {
+                await db.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return Result.Failure(MinifigureErrors.ConcurrencyConflict);
+            }
+
+            return Result.Success();
+        }
+
+        public async Task<Result> ListForTradeAsync(int id, byte[] rowVersion, string? tradeNotes, CancellationToken cancellationToken = default)
+        {
+            var figure = await db.Minifigures.FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
+            if (figure is null)
+            {
+                return Result.Failure(MinifigureErrors.NotFound(id));
+            }
+
+            if (!figure.RowVersion.SequenceEqual(rowVersion))
+            {
+                return Result.Failure(MinifigureErrors.ConcurrencyConflict);
+            }
+
+            if (figure.IsArchived)
+            {
+                return Result.Failure(MinifigureErrors.NotOwned(figure.Status));
+            }
+
+            var notes = string.IsNullOrWhiteSpace(tradeNotes) ? null : tradeNotes.Trim();
+
+            if (notes?.Length > Minifigure.TradeNotesMaxLength)
+            {
+                return Result.Failure(MinifigureErrors.TradeNotesTooLong);
+            }
+
+            figure.ListForTrade(notes);
+
+            if (!db.ChangeTracker.HasChanges())
+            {
+                return Result.Success(); //same as before, nothing changed just return success
+            }
+
+            figure.MarkUpdated(GetUtcNow());
+            db.Entry(figure).Property(m => m.RowVersion).OriginalValue = rowVersion;
+
+            try
+            {
+                await db.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return Result.Failure(MinifigureErrors.ConcurrencyConflict);
+            }
+
+            return Result.Success();
+        }
+
+        public async Task<Result> RemoveFromTradeAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var figure = await db.Minifigures.FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
+            if (figure is null)
+            {
+                return Result.Failure(MinifigureErrors.NotFound(id));
+            }
+
+            figure.RemoveFromTrade();
+
+            if (!db.ChangeTracker.HasChanges())
+            {
+                return Result.Success();
+            }
+
+            figure.MarkUpdated(GetUtcNow());
+
+            try
+            {
+                await db.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return Result.Failure(MinifigureErrors.ConcurrencyConflict);
+            }
+
+            return Result.Success();
+        }
+
 
         private static MinifigureDetailsCommand Normalize(MinifigureDetailsCommand command)
         {

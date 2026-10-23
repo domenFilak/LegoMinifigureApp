@@ -28,9 +28,7 @@ namespace LegoMinifigureApp.Areas.Admin.ViewModels.Minifigures
                 Condition = dto.Condition.ToString(),
                 ImageUrl = ImageUrls.ForMinifigure(dto.ImagePath),
                 IsForSale = dto.IsForSale,
-                AskingPriceText = dto.AskingPrice.HasValue
-                    ? dto.AskingPrice.Value.ToString("0.00", CultureInfo.InvariantCulture) + " €"
-                    : null,
+                AskingPriceText = PriceText.Format(dto.AskingPrice),
                 IsForTrade = dto.IsForTrade,
                 CreatedAt = dto.CreatedAt
             };

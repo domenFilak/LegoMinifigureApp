@@ -62,6 +62,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRequestLocalization("en-US");
 app.UseStaticFiles();
 app.UseRouting();
 

@@ -1,4 +1,5 @@
 ﻿using LegoMinifigureApp.Entities;
+using LegoMinifigureApp.Entities.Enums;
 using LegoMinifigureApp.Services.Common;
 
 namespace LegoMinifigureApp.Services.Minifigures
@@ -34,5 +35,17 @@ namespace LegoMinifigureApp.Services.Minifigures
 
         public static Error ConcurrencyConflict =>
             Error.Conflict("This figure was already changed elsewhere. Reload the page and make your changes again.");
+
+        public static Error NotOwned(MinifigureStatus status) =>
+            Error.Conflict($"This figure is {status} and can't be listed.");
+
+        public static Error AskingPriceNotPositive =>
+            Error.Validation("Asking price must be greater than 0.", nameof(Minifigure.AskingPrice));
+
+        public static Error AskingPriceTooHigh =>
+            Error.Validation($"Asking price can be at most {Minifigure.MaxAskingPrice} €.", nameof(Minifigure.AskingPrice));
+
+        public static Error TradeNotesTooLong =>
+            Error.Validation($"Trade notes can be at most {Minifigure.TradeNotesMaxLength} characters.", nameof(Minifigure.TradeNotes));
     }
 }

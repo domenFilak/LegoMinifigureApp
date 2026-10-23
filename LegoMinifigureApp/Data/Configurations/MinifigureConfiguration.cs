@@ -26,7 +26,7 @@ namespace LegoMinifigureApp.Data.Configurations
                 .HasMaxLength(20);
 
             builder.Property(m => m.AskingPrice).HasPrecision(10, 2);
-            builder.Property(m => m.TradeNotes).HasMaxLength(500);
+            builder.Property(m => m.TradeNotes).HasMaxLength(Minifigure.TradeNotesMaxLength);
 
             //concurrency
             builder.Property(m => m.RowVersion).IsRowVersion();
