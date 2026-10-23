@@ -1,0 +1,130 @@
+﻿@model MinifigureDetailsViewModel
+
+@{
+	ViewData["Title"] = Model.Name;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+	<div>
+		<h1 class="mb-0">@Model.Name</h1>
+		<div class="text-muted">@Model.BrickLinkId · @Model.ThemeName</div>
+	</div>
+	<a asp-action="Index" class="btn btn-outline-secondary">Back to list</a>
+</div>
+
+@if (Model.IsArchived)
+{
+	<div class="alert alert-secondary">
+		This figure is <strong>@Model.Status</strong>
+		@if (Model.StatusChangedAt.HasValue)
+		{
+			<span>
+				since
+				<time datetime="@UtcDates.ToIso(Model.StatusChangedAt.Value)" data-local-time>@UtcDates.ToFallbackText(Model.StatusChangedAt.Value)</time>
+			</span>
+		}
+		and is no longer part of your collection.
+	</div>
+}
+
+<div class="row g-4">
+	<!--more details fields-->
+	<div class="col-lg-7">
+		<div class="card shadow-sm">
+			<div class="card-body">
+				<img src="@Model.ImageUrl" alt="@Model.Name" class="figure-thumb mb-3" style="height: 280px;" />
+
+				<dl class="row mb-0">
+					<dt class="col-sm-4">Condition</dt>
+					<dd class="col-sm-8">@Model.Condition</dd>
+
+					<dt class="col-sm-4">Release year</dt>
+					<dd class="col-sm-8">@(Model.ReleaseYear?.ToString() ?? "–")</dd>
+
+					<dt class="col-sm-4">Description</dt>
+					<dd class="col-sm-8">@(Model.Description ?? "–")</dd>
+
+					<dt class="col-sm-4">Added</dt>
+					<dd class="col-sm-8">
+						<time datetime="@UtcDates.ToIso(Model.CreatedAt)" data-local-time>@UtcDates.ToFallbackText(Model.CreatedAt)</time>
+					</dd>
+
+					<dt class="col-sm-4">Last updated</dt>
+					<dd class="col-sm-8">
+						@if (Model.UpdatedAt.HasValue)
+						{
+							<time datetime="@UtcDates.ToIso(Model.UpdatedAt.Value)" data-local-time>@UtcDates.ToFallbackText(Model.UpdatedAt.Value)</time>
+						}
+						else
+						{
+							<span>Never</span>
+						}
+					</dd>
+				</dl>
+			</div>
+		</div>
+	</div>
+
+	<!--state and actions-->
+	<div class="col-lg-5">
+		@if (!Model.IsArchived)
+		{
+			<!--sale-->
+			<div class="card shadow-sm mb-3">
+				<div class="card-body">
+					<h2 class="h6 text-uppercase text-muted">Sale</h2>
+
+					@if (Model.IsForSale)
+					{
+						<p class="fs-5 mb-3">
+							<span class="badge text-bg-success">For sale · @Model.AskingPriceText</span>
+						</p>
+						<a asp-action="Sale" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-primary">Change price</a>
+						<form asp-action="RemoveFromSale" asp-route-id="@Model.Id" method="post" class="d-inline">
+							<button type="submit" class="btn btn-sm btn-outline-secondary">Remove from sale</button>
+						</form>
+					}
+					else
+					{
+						<p class="text-muted mb-3">Not for sale.</p>
+						<a asp-action="Sale" asp-route-id="@Model.Id" class="btn btn-sm btn-primary">List for sale</a>
+					}
+				</div>
+			</div>
+
+			<!--trade-->
+			<div class="card shadow-sm mb-3">
+				<div class="card-body">
+					<h2 class="h6 text-uppercase text-muted">Trade</h2>
+
+					@if (Model.IsForTrade)
+					{
+						<p class="mb-2"><span class="badge text-bg-info">For trade</span></p>
+						@if (Model.TradeNotes is not null)
+						{
+							<p class="small mb-3">@Model.TradeNotes</p>
+						}
+						<a asp-action="Trade" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-primary">Edit notes</a>
+						<form asp-action="RemoveFromTrade" asp-route-id="@Model.Id" method="post" class="d-inline">
+							<button type="submit" class="btn btn-sm btn-outline-secondary">Remove from trade</button>
+						</form>
+					}
+					else
+					{
+						<p class="text-muted mb-3">Not for trade.</p>
+						<a asp-action="Trade" asp-route-id="@Model.Id" class="btn btn-sm btn-primary">List for trade</a>
+					}
+				</div>
+			</div>
+		}
+
+		<!--collection-->
+		<div class="card shadow-sm">
+			<div class="card-body">
+				<h2 class="h6 text-uppercase text-muted">Collection</h2>
+				<p class="mb-3">Status: <strong>@Model.Status</strong></p>
+				<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-primary">Edit details</a>
+			</div>
+		</div>
+	</div>
+</div>

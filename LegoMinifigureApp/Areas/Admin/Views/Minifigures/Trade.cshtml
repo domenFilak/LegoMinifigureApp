@@ -1,0 +1,37 @@
+﻿@model MinifigureTradeFormViewModel
+
+@{
+	ViewData["Title"] = Model.IsCurrentlyForTrade ? "Edit trade notes" : "List for trade";
+}
+
+<h1 class="mb-1">@ViewData["Title"]</h1>
+<p class="text-muted mb-4">@Model.Name</p>
+
+<div class="row">
+	<div class="col-md-8 col-lg-6">
+		<div class="card shadow-sm">
+			<div class="card-body">
+				<form asp-action="Trade" asp-route-id="@Model.Id" method="post">
+					<input type="hidden" asp-for="RowVersion" />
+					<input type="hidden" asp-for="Name" />
+					<input type="hidden" asp-for="IsCurrentlyForTrade" />
+
+					<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+					<div class="mb-3">
+						<label asp-for="TradeNotes" class="form-label"></label>
+						<textarea asp-for="TradeNotes" class="form-control" rows="4" placeholder="Optional – e.g. what you'd like in return"></textarea>
+						<span asp-validation-for="TradeNotes" class="text-danger"></span>
+					</div>
+
+					<button type="submit" class="btn btn-primary">@(Model.IsCurrentlyForTrade ? "Save notes" : "List for trade")</button>
+					<a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+}

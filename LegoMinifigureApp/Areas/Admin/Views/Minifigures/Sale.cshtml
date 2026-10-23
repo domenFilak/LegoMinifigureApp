@@ -1,0 +1,39 @@
+﻿@model MinifigureSaleFormViewModel
+
+@{
+	ViewData["Title"] = Model.IsCurrentlyForSale ? "Change price" : "List for sale";
+}
+
+<h1 class="mb-1">@ViewData["Title"]</h1>
+<p class="text-muted mb-4">@Model.Name</p>
+
+<div class="row">
+	<div class="col-md-6 col-lg-4">
+		<div class="card shadow-sm">
+			<div class="card-body">
+				<form asp-action="Sale" asp-route-id="@Model.Id" method="post">
+					<input type="hidden" asp-for="RowVersion" />
+					<input type="hidden" asp-for="Name" />
+					<input type="hidden" asp-for="IsCurrentlyForSale" />
+
+					<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+					<div class="mb-3">
+						<label asp-for="AskingPrice" class="form-label"></label>
+						<input asp-for="AskingPrice" type="number" step="0.01" min="0.01"
+							   max="@LegoMinifigureApp.Entities.Minifigure.MaxAskingPrice"
+							   class="form-control" autofocus />
+						<span asp-validation-for="AskingPrice" class="text-danger"></span>
+					</div>
+
+					<button type="submit" class="btn btn-primary">@(Model.IsCurrentlyForSale ? "Save price" : "List for sale")</button>
+					<a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+}

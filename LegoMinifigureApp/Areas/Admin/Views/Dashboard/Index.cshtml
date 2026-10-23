@@ -23,8 +23,10 @@
 						@foreach (var figure in Model.LatestFigures)
 						{
 							<div class="col-4 text-center">
-								<img src="@figure.ImageUrl" alt="@figure.Name" class="figure-thumb" />
-								<div class="small text-truncate mt-1" title="@figure.Name">@figure.Name</div>
+								<a asp-area="Admin" asp-controller="Minifigures" asp-action="Details" asp-route-id="@figure.Id" class="text-decoration-none text-reset">
+									<img src="@figure.ImageUrl" alt="@figure.Name" class="figure-thumb" />
+									<div class="small text-truncate mt-1" title="@figure.Name">@figure.Name</div>
+								</a>
 							</div>
 						}
 					</div>
