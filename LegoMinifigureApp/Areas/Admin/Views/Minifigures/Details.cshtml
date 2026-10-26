@@ -15,15 +15,21 @@
 @if (Model.IsArchived)
 {
 	<div class="alert alert-secondary">
-		This figure is <strong>@Model.Status</strong>
+		<strong>@Model.Status</strong>
+		@if (Model.SalePriceText is not null)
+		{
+			<span>for @Model.SalePriceText</span>
+		}
 		@if (Model.StatusChangedAt.HasValue)
 		{
 			<span>
-				since
-				<time datetime="@UtcDates.ToIso(Model.StatusChangedAt.Value)" data-local-time>@UtcDates.ToFallbackText(Model.StatusChangedAt.Value)</time>
+				on <time datetime="@UtcDates.ToIso(Model.StatusChangedAt.Value)" data-local-time>@UtcDates.ToFallbackText(Model.StatusChangedAt.Value)</time>
 			</span>
 		}
-		and is no longer part of your collection.
+		@if (Model.ArchiveNote is not null)
+		{
+			<div class="mt-1">@Model.ArchiveNote</div>
+		}
 	</div>
 }
 
@@ -123,7 +129,22 @@
 			<div class="card-body">
 				<h2 class="h6 text-uppercase text-muted">Collection</h2>
 				<p class="mb-3">Status: <strong>@Model.Status</strong></p>
-				<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-primary">Edit details</a>
+
+				<div class="d-flex flex-wrap gap-2">
+					<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-primary">Edit details</a>
+
+					@if (!Model.IsArchived)
+					{
+						<a asp-action="MarkAsSold" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-secondary">Mark as sold</a>
+						<a asp-action="MarkAsTraded" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-secondary">Mark as traded</a>
+					}
+					else
+					{
+						<form asp-action="Restore" asp-route-id="@Model.Id" method="post">
+							<button type="submit" class="btn btn-sm btn-outline-success">Restore to collection</button>
+						</form>
+					}
+				</div>
 			</div>
 		</div>
 	</div>

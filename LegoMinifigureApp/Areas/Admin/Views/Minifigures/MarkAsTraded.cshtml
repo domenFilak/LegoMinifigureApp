@@ -1,0 +1,45 @@
+﻿@model MinifigureTradedFormViewModel
+
+@{
+	ViewData["Title"] = "Mark as traded";
+}
+
+<h1 class="mb-1">@ViewData["Title"]</h1>
+<p class="text-muted mb-4">@Model.Name</p>
+
+<div class="row">
+	<div class="col-md-8 col-lg-6">
+		<div class="card shadow-sm">
+			<div class="card-body">
+				<p>
+					<strong>@Model.Name</strong> will move to the Archive and leave your collection.
+					@if (Model.CurrentListingText is not null)
+					{
+						<span>It's currently @Model.CurrentListingText, and these listings will be removed.</span>
+					}
+				</p>
+
+				<form asp-action="MarkAsTraded" asp-route-id="@Model.Id" method="post">
+					<input type="hidden" asp-for="RowVersion" />
+					<input type="hidden" asp-for="Name" />
+					<input type="hidden" asp-for="CurrentListingText" />
+
+					<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+					<div class="mb-3">
+						<label asp-for="ArchiveNote" class="form-label"></label>
+						<textarea asp-for="ArchiveNote" class="form-control" rows="3" placeholder="Optional – e.g. traded to Ana for sw0001"></textarea>
+						<span asp-validation-for="ArchiveNote" class="text-danger"></span>
+					</div>
+
+					<button type="submit" class="btn btn-primary">Mark as traded</button>
+					<a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+}

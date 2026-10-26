@@ -14,6 +14,8 @@ namespace LegoMinifigureApp.Services.Minifigures.Dtos
         string? ImagePath,
         MinifigureStatus Status,
         DateTime? StatusChangedAt,
+        decimal? SalePrice,
+        string? ArchiveNote,
         bool IsForSale,
         decimal? AskingPrice,
         bool IsForTrade,

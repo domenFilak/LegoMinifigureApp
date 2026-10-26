@@ -207,6 +207,8 @@ namespace LegoMinifigureApp.Services.Minifigures
                     m.ImagePath,
                     m.Status,
                     m.StatusChangedAt,
+                    m.SalePrice,
+                    m.ArchiveNote,
                     m.IsForSale,
                     m.AskingPrice,
                     m.IsForTrade,
@@ -375,6 +377,133 @@ namespace LegoMinifigureApp.Services.Minifigures
             return Result.Success();
         }
 
+        public async Task<Result> MarkAsSoldAsync(int id, byte[] rowVersion, decimal salePrice, string? note, CancellationToken cancellationToken = default)
+        {
+            var figure = await db.Minifigures.FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
+            if (figure is null)
+            {
+                return Result.Failure(MinifigureErrors.NotFound(id));
+            }
+
+            if (!figure.RowVersion.SequenceEqual(rowVersion))
+            {
+                return Result.Failure(MinifigureErrors.ConcurrencyConflict);
+            }
+
+            if (figure.IsArchived)
+            {
+                return Result.Failure(MinifigureErrors.AlreadyArchived(figure.Status));
+            }
+
+            var price = decimal.Round(salePrice, 2, MidpointRounding.AwayFromZero);
+
+            if (price <= 0)
+            {
+                return Result.Failure(MinifigureErrors.SalePriceNotPositive);
+            }
+
+            if (price > Minifigure.MaxSalePrice)
+            {
+                return Result.Failure(MinifigureErrors.SalePriceTooHigh);
+            }
+
+            var normalizedNote = string.IsNullOrWhiteSpace(note) ? null : note.Trim();
+
+            if (normalizedNote?.Length > Minifigure.ArchiveNoteMaxLength)
+            {
+                return Result.Failure(MinifigureErrors.ArchiveNoteTooLong);
+            }
+
+            var now = GetUtcNow();
+            figure.MarkAsSold(price, normalizedNote, now);
+            figure.MarkUpdated(now);
+
+            db.Entry(figure).Property(m => m.RowVersion).OriginalValue = rowVersion;
+
+            try
+            {
+                await db.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return Result.Failure(MinifigureErrors.ConcurrencyConflict);
+            }
+
+            return Result.Success();
+        }
+
+        public async Task<Result> MarkAsTradedAsync(int id, byte[] rowVersion, string? note, CancellationToken cancellationToken = default)
+        {
+            var figure = await db.Minifigures.FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
+            if (figure is null)
+            {
+                return Result.Failure(MinifigureErrors.NotFound(id));
+            }
+
+            if (!figure.RowVersion.SequenceEqual(rowVersion))
+            {
+                return Result.Failure(MinifigureErrors.ConcurrencyConflict);
+            }
+
+            if (figure.IsArchived)
+            {
+                return Result.Failure(MinifigureErrors.AlreadyArchived(figure.Status));
+            }
+
+            var normalizedNote = string.IsNullOrWhiteSpace(note) ? null : note.Trim();
+
+            if (normalizedNote?.Length > Minifigure.ArchiveNoteMaxLength)
+            {
+                return Result.Failure(MinifigureErrors.ArchiveNoteTooLong);
+            }
+
+            var now = GetUtcNow();
+            figure.MarkAsTraded(normalizedNote, now);
+            figure.MarkUpdated(now);
+
+            db.Entry(figure).Property(m => m.RowVersion).OriginalValue = rowVersion;
+
+            try
+            {
+                await db.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return Result.Failure(MinifigureErrors.ConcurrencyConflict);
+            }
+
+            return Result.Success();
+        }
+
+        public async Task<Result> RestoreAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var figure = await db.Minifigures.FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
+            if (figure is null)
+            {
+                return Result.Failure(MinifigureErrors.NotFound(id));
+            }
+
+            var now = GetUtcNow();
+            figure.Restore(now);
+
+            if (!db.ChangeTracker.HasChanges())
+            {
+                return Result.Success();
+            }
+
+            figure.MarkUpdated(now);
+
+            try
+            {
+                await db.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return Result.Failure(MinifigureErrors.ConcurrencyConflict);
+            }
+
+            return Result.Success();
+        }
 
         private static MinifigureDetailsCommand Normalize(MinifigureDetailsCommand command)
         {

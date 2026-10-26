@@ -262,6 +262,132 @@ namespace LegoMinifigureApp.Areas.Admin.Controllers
             return RedirectToAction(nameof(Details), new { id });
         }
 
+        [HttpGet]
+        public async Task<IActionResult> MarkAsSold(int id, CancellationToken cancellationToken)
+        {
+            var figure = await _minifigureService.GetDetailsAsync(id, cancellationToken);
+            if (figure is null)
+            {
+                return NotFound();
+            }
+
+            if (figure.Status != MinifigureStatus.Owned)
+            {
+                TempData[TempDataKeys.Error] = $"This figure is already {figure.Status}.";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            return View(MinifigureSoldFormViewModel.From(figure));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MarkAsSold(int id, MinifigureSoldFormViewModel model, CancellationToken cancellationToken)
+        {
+            model.Id = id;
+
+            var rowVersion = RowVersionText.TryDecode(model.RowVersion);
+            if (rowVersion is null)
+            {
+                return BadRequest();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var result = await _minifigureService.MarkAsSoldAsync(id, rowVersion, model.SalePrice!.Value, model.ArchiveNote, cancellationToken);
+
+            if (result.IsFailure)
+            {
+                if (result.Error!.Type == ErrorType.NotFound)
+                {
+                    return NotFound();
+                }
+
+                ModelState.AddModelError(result.Error.Field ?? string.Empty, result.Error.Message);
+                return View(model);
+            }
+
+            var price = decimal.Round(model.SalePrice.Value, 2, MidpointRounding.AwayFromZero);
+            TempData[TempDataKeys.Success] = $"Marked as sold for {PriceText.Format(price)}.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MarkAsTraded(int id, CancellationToken cancellationToken)
+        {
+            var figure = await _minifigureService.GetDetailsAsync(id, cancellationToken);
+            if (figure is null)
+            {
+                return NotFound();
+            }
+
+            if (figure.Status != MinifigureStatus.Owned)
+            {
+                TempData[TempDataKeys.Error] = $"This figure is already {figure.Status}.";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            return View(MinifigureTradedFormViewModel.From(figure));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MarkAsTraded(int id, MinifigureTradedFormViewModel model, CancellationToken cancellationToken)
+        {
+            model.Id = id;
+
+            var rowVersion = RowVersionText.TryDecode(model.RowVersion);
+            if (rowVersion is null)
+            {
+                return BadRequest();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var result = await _minifigureService.MarkAsTradedAsync(id, rowVersion, model.ArchiveNote, cancellationToken);
+
+            if (result.IsFailure)
+            {
+                if (result.Error!.Type == ErrorType.NotFound)
+                {
+                    return NotFound();
+                }
+
+                ModelState.AddModelError(result.Error.Field ?? string.Empty, result.Error.Message);
+                return View(model);
+            }
+
+            TempData[TempDataKeys.Success] = "Marked as traded.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Restore(int id, CancellationToken cancellationToken)
+        {
+            var result = await _minifigureService.RestoreAsync(id, cancellationToken);
+
+            if (result.IsFailure)
+            {
+                if (result.Error!.Type == ErrorType.NotFound)
+                {
+                    return NotFound();
+                }
+
+                TempData[TempDataKeys.Error] = result.Error.Message;
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            TempData[TempDataKeys.Success] = "Restored to your collection.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
         private async Task LoadOptionsAsync(MinifigureFormViewModel model, CancellationToken cancellationToken)
         {
             var themes = await _themeService.GetOptionsAsync(cancellationToken);

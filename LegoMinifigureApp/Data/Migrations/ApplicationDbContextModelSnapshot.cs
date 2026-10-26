@@ -95,6 +95,10 @@ namespace LegoMinifigureApp.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ArchiveNote")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<decimal?>("AskingPrice")
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");
@@ -146,6 +150,10 @@ namespace LegoMinifigureApp.Data.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
 
+                    b.Property<decimal?>("SalePrice")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -172,8 +180,10 @@ namespace LegoMinifigureApp.Data.Migrations
 
                     b.HasIndex("ThemeId");
 
-                    b.ToTable("Minifigures", null, t =>
+                    b.ToTable("Minifigures", t =>
                         {
+                            t.HasCheckConstraint("CK_Minifigures_ArchiveNote", "[ArchiveNote] IS NULL OR [Status] <> 'Owned'");
+
                             t.HasCheckConstraint("CK_Minifigures_AskingPrice", "([IsForSale] = 0 AND [AskingPrice] IS NULL) OR ([IsForSale] = 1 AND [AskingPrice] > 0)");
 
                             t.HasCheckConstraint("CK_Minifigures_DeletedAt", "([IsDeleted] = 0 AND [DeletedAt] IS NULL) OR ([IsDeleted] = 1 AND [DeletedAt] IS NOT NULL)");
@@ -181,6 +191,8 @@ namespace LegoMinifigureApp.Data.Migrations
                             t.HasCheckConstraint("CK_Minifigures_ListingRequiresOwned", "[Status] = 'Owned' OR ([IsForSale] = 0 AND [IsForTrade] = 0)");
 
                             t.HasCheckConstraint("CK_Minifigures_ReleaseYear", "[ReleaseYear] IS NULL OR [ReleaseYear] >= 1978");
+
+                            t.HasCheckConstraint("CK_Minifigures_SalePrice", "[SalePrice] IS NULL OR ([Status] = 'Sold' AND [SalePrice] > 0)");
 
                             t.HasCheckConstraint("CK_Minifigures_StatusChangedAt", "[Status] = 'Owned' OR [StatusChangedAt] IS NOT NULL");
 
@@ -219,7 +231,7 @@ namespace LegoMinifigureApp.Data.Migrations
                         .IsUnique()
                         .HasFilter("[IsDeleted] = 0");
 
-                    b.ToTable("Themes", null, t =>
+                    b.ToTable("Themes", t =>
                         {
                             t.HasCheckConstraint("CK_Themes_DeletedAt", "([IsDeleted] = 0 AND [DeletedAt] IS NULL) OR ([IsDeleted] = 1 AND [DeletedAt] IS NOT NULL)");
                         });

@@ -47,5 +47,17 @@ namespace LegoMinifigureApp.Services.Minifigures
 
         public static Error TradeNotesTooLong =>
             Error.Validation($"Trade notes can be at most {Minifigure.TradeNotesMaxLength} characters.", nameof(Minifigure.TradeNotes));
+
+        public static Error AlreadyArchived(MinifigureStatus status) =>
+            Error.Conflict($"This figure is already {status}.");
+
+        public static Error SalePriceNotPositive =>
+            Error.Validation("Sale price must be greater than 0.", nameof(Minifigure.SalePrice));
+
+        public static Error SalePriceTooHigh =>
+            Error.Validation($"Sale price can be at most {Minifigure.MaxSalePrice} €.", nameof(Minifigure.SalePrice));
+
+        public static Error ArchiveNoteTooLong =>
+            Error.Validation($"Note can be at most {Minifigure.ArchiveNoteMaxLength} characters.", nameof(Minifigure.ArchiveNote));
     }
 }

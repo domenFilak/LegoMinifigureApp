@@ -13,6 +13,8 @@ namespace LegoMinifigureApp.Entities
         public const int ReleaseYearMaxYearsAhead = 2;
         public const int TradeNotesMaxLength = 500;
         public const int MaxAskingPrice = 10000;
+        public const int ArchiveNoteMaxLength = 500;
+        public const int MaxSalePrice = 10000;
 
         public int Id { get; private set; }
         //description of the minifigure, editable
@@ -32,6 +34,9 @@ namespace LegoMinifigureApp.Entities
         public decimal? AskingPrice { get; private set; }
         public bool IsForTrade { get; private set; }
         public string? TradeNotes { get; private set; }
+        //information when figure is archived (info about sale/trade etc.)
+        public decimal? SalePrice { get; private set; }
+        public string? ArchiveNote { get; private set; }
 
         //concurency
         public byte[] RowVersion { get; private set; } = null!;
@@ -69,18 +74,34 @@ namespace LegoMinifigureApp.Entities
             TradeNotes = null;
         }
 
-        public void Archive(MinifigureStatus newStatus, DateTime changedAtUtc)
+        public void MarkAsSold(decimal salePrice, string? note, DateTime changedAtUtc)
         {
-            if (newStatus == MinifigureStatus.Owned)
-            {
-                throw new ArgumentException("Use Restore() to return a figure to the collection.", nameof(newStatus));
-            }
-            
             EnsureOwned();
+            if (salePrice <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(salePrice), "Sale price must be greater than zero.");
+            }
+
             RemoveFromSale();
             RemoveFromTrade();
-            Status = newStatus;
+
+            Status = MinifigureStatus.Sold;
             StatusChangedAt = changedAtUtc;
+            SalePrice = salePrice;
+            ArchiveNote = string.IsNullOrWhiteSpace(note) ? null : note.Trim();
+        }
+
+        public void MarkAsTraded(string? note, DateTime changedAtUtc)
+        {
+            EnsureOwned();
+
+            RemoveFromSale();
+            RemoveFromTrade();
+
+            Status = MinifigureStatus.Traded;
+            StatusChangedAt = changedAtUtc;
+            SalePrice = null;
+            ArchiveNote = string.IsNullOrWhiteSpace(note) ? null : note.Trim();
         }
 
         public void Restore(DateTime changedAtUtc)
@@ -92,14 +113,16 @@ namespace LegoMinifigureApp.Entities
 
             Status = MinifigureStatus.Owned;
             StatusChangedAt = changedAtUtc;
+            SalePrice = null;
+            ArchiveNote = null;
         }
 
         private void EnsureOwned()
         {
             if (IsArchived)
             {
-                throw new InvalidOperationException($"Minifigure {Id} is {Status} and cannot be listed.");
-            }   
+                throw new InvalidOperationException($"Minifigure {Id} is already {Status}.");
+            }
         }
     }
 }

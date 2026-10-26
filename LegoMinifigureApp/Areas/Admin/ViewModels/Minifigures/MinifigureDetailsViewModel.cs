@@ -23,6 +23,8 @@ namespace LegoMinifigureApp.Areas.Admin.ViewModels.Minifigures
         public string? AskingPriceText { get; init; }
         public bool IsForTrade { get; init; }
         public string? TradeNotes { get; init; }
+        public string? SalePriceText { get; init; }
+        public string? ArchiveNote { get; init; }
 
         public DateTime CreatedAt { get; init; }
         public DateTime? UpdatedAt { get; init; }
@@ -46,6 +48,8 @@ namespace LegoMinifigureApp.Areas.Admin.ViewModels.Minifigures
                 AskingPriceText = PriceText.Format(dto.AskingPrice),
                 IsForTrade = dto.IsForTrade,
                 TradeNotes = dto.TradeNotes,
+                SalePriceText = PriceText.Format(dto.SalePrice),
+                ArchiveNote = dto.ArchiveNote,
                 CreatedAt = dto.CreatedAt,
                 UpdatedAt = dto.UpdatedAt
             };

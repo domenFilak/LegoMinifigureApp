@@ -27,6 +27,8 @@ namespace LegoMinifigureApp.Data.Configurations
 
             builder.Property(m => m.AskingPrice).HasPrecision(10, 2);
             builder.Property(m => m.TradeNotes).HasMaxLength(Minifigure.TradeNotesMaxLength);
+            builder.Property(m => m.SalePrice).HasPrecision(10, 2);
+            builder.Property(m => m.ArchiveNote).HasMaxLength(Minifigure.ArchiveNoteMaxLength);
 
             //concurrency
             builder.Property(m => m.RowVersion).IsRowVersion();
@@ -66,6 +68,12 @@ namespace LegoMinifigureApp.Data.Configurations
 
                 t.HasCheckConstraint("CK_Minifigures_DeletedAt",
                     "([IsDeleted] = 0 AND [DeletedAt] IS NULL) OR ([IsDeleted] = 1 AND [DeletedAt] IS NOT NULL)");
+
+                t.HasCheckConstraint("CK_Minifigures_SalePrice",
+                    "[SalePrice] IS NULL OR ([Status] = 'Sold' AND [SalePrice] > 0)");
+
+                t.HasCheckConstraint("CK_Minifigures_ArchiveNote",
+                    "[ArchiveNote] IS NULL OR [Status] <> 'Owned'");
             });
         }
     }
