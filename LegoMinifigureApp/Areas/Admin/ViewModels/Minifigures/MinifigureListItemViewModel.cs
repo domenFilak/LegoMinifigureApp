@@ -16,6 +16,8 @@ namespace LegoMinifigureApp.Areas.Admin.ViewModels.Minifigures
         public string? AskingPriceText { get; init; }
         public bool IsForTrade { get; init; }
         public DateTime CreatedAt { get; init; }
+        public string SaleTooltip { get; init; } = string.Empty;
+        public string TradeTooltip { get; init; } = string.Empty;
 
         public static MinifigureListItemViewModel From(MinifigureListItemDto dto)
         {
@@ -30,7 +32,9 @@ namespace LegoMinifigureApp.Areas.Admin.ViewModels.Minifigures
                 IsForSale = dto.IsForSale,
                 AskingPriceText = PriceText.Format(dto.AskingPrice),
                 IsForTrade = dto.IsForTrade,
-                CreatedAt = dto.CreatedAt
+                CreatedAt = dto.CreatedAt,
+                SaleTooltip = TooltipText.AskingPrice(dto.AskingPrice),
+                TradeTooltip = TooltipText.TradeNotes(dto.TradeNotes)
             };
         }
     }

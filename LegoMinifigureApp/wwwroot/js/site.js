@@ -13,3 +13,15 @@ document.querySelectorAll('time[data-local-time]').forEach(el => {
         minute: '2-digit'
     });
 });
+
+//bootstrap tooltip, activate on every element with data-bs-toggle="tooltip"
+document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+    new bootstrap.Tooltip(el);
+});
+
+//status messages, start fading after 5 seconds
+document.querySelectorAll('.alert[data-auto-dismiss]').forEach(el => {
+    setTimeout(() => {
+        bootstrap.Alert.getOrCreateInstance(el).close();
+    }, 5000);
+});

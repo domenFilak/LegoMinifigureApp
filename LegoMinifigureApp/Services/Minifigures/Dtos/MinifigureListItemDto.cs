@@ -13,6 +13,7 @@ namespace LegoMinifigureApp.Services.Minifigures.Dtos
         bool IsForSale,
         decimal? AskingPrice,
         bool IsForTrade,
+        string? TradeNotes,
         DateTime CreatedAt
     );
 }

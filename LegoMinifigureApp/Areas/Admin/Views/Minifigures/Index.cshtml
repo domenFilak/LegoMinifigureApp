@@ -80,11 +80,15 @@ else
 							<td>
 								@if (figure.IsForSale)
 								{
-									<span class="badge text-bg-success">For sale · @figure.AskingPriceText</span>
+									<span class="badge text-bg-success" data-bs-toggle="tooltip" title="@figure.SaleTooltip">
+										For sale · @figure.AskingPriceText
+									</span>
 								}
 								@if (figure.IsForTrade)
 								{
-									<span class="badge text-bg-info">For trade</span>
+									<span class="badge text-bg-info" data-bs-toggle="tooltip" title="@figure.TradeTooltip">
+										For trade
+									</span>
 								}
 							</td>
 							<td class="text-end">

@@ -65,6 +65,7 @@ namespace LegoMinifigureApp.Services.Minifigures
                     m.IsForSale,
                     m.AskingPrice,
                     m.IsForTrade,
+                    m.TradeNotes,
                     m.CreatedAt))
                 .ToListAsync(cancellationToken);
 
