@@ -1,0 +1,135 @@
+﻿@model MinifigureArchiveViewModel
+
+@{
+	ViewData["Title"] = "Archive";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+	<h1 class="mb-0">@ViewData["Title"]</h1>
+	<a asp-action="Index" class="btn btn-outline-secondary">Back to collection</a>
+</div>
+
+<!-- Filters, GET form; values go into URL -->
+<form asp-action="Archive" method="get" class="card card-body shadow-sm mb-4">
+	<div class="row g-2 align-items-end">
+		<div class="col-md-4">
+			<label asp-for="Search" class="form-label">Search</label>
+			<input asp-for="Search" class="form-control" placeholder="Name or BrickLink ID" />
+		</div>
+		<div class="col-md-3">
+			<label asp-for="ThemeId" class="form-label">Theme</label>
+			<select asp-for="ThemeId" asp-items="Model.ThemeOptions" class="form-select">
+				<option value="">All themes</option>
+			</select>
+		</div>
+		<div class="col-md-3">
+			<label asp-for="Status" class="form-label">Status</label>
+			<select asp-for="Status" asp-items="Model.StatusOptions" class="form-select"></select>
+		</div>
+		<div class="col-md-2 d-flex gap-2">
+			<button type="submit" class="btn btn-outline-primary w-100">Filter</button>
+			@if (Model.HasActiveFilters)
+			{
+				<a asp-action="Archive" class="btn btn-outline-secondary" title="Clear filters">✕</a>
+			}
+		</div>
+	</div>
+</form>
+
+@if (!Model.HasItems)
+{
+	<div class="card card-body shadow-sm text-center text-muted">
+		@if (Model.HasActiveFilters)
+		{
+			<p class="mb-2">No archived figures match your filters.</p>
+			<a asp-action="Archive">Clear filters</a>
+		}
+		else
+		{
+			<p class="mb-0">No sold or traded figures yet.</p>
+		}
+	</div>
+}
+else
+{
+	<div class="card shadow-sm">
+		<div class="table-responsive">
+			<table class="table table-hover align-middle mb-0">
+				<thead class="table-light">
+					<tr>
+						<th style="width: 64px;"></th>
+						<th>Name</th>
+						<th>Theme</th>
+						<th>Status</th>
+						<th class="text-end">Sale price</th>
+						<th>Note</th>
+						<th class="text-end">Date</th>
+						<th class="text-end">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var figure in Model.Items)
+					{
+						<tr>
+							<td><img src="@figure.ImageUrl" alt="@figure.Name" class="figure-thumb-sm" /></td>
+							<td>
+								<div class="fw-semibold">@figure.Name</div>
+								<div class="small text-muted">@figure.BrickLinkId</div>
+							</td>
+							<td>@figure.ThemeName</td>
+							<td>
+								<span class="badge @(figure.IsSold ? "text-bg-success" : "text-bg-info")">@figure.Status</span>
+							</td>
+							<td class="text-end">@(figure.SalePriceText ?? "–")</td>
+							<td>
+								@if (figure.ArchiveNote is not null)
+								{
+									<span class="d-inline-block text-truncate archive-note" data-bs-toggle="tooltip" title="@figure.ArchiveNote">@figure.ArchiveNote</span>
+								}
+								else
+								{
+									<span class="text-muted">–</span>
+								}
+							</td>
+							<td class="text-end">
+								@if (figure.StatusChangedAt.HasValue)
+								{
+									<time datetime="@UtcDates.ToIso(figure.StatusChangedAt.Value)" data-local-time>@UtcDates.ToFallbackText(figure.StatusChangedAt.Value)</time>
+								}
+							</td>
+							<td class="text-end">
+								<a asp-action="Details" asp-route-id="@figure.Id" class="btn btn-sm btn-outline-secondary">Manage</a>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<!-- Paging -->
+	<div class="d-flex justify-content-between align-items-center mt-3">
+		<span class="text-muted small">
+			Showing @Model.FirstItemNumber–@Model.LastItemNumber of @Model.TotalCount
+		</span>
+
+		@if (Model.TotalPages > 1)
+		{
+			<nav aria-label="Archive pages">
+				<ul class="pagination mb-0">
+					<li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+						<a class="page-link" asp-action="Archive"
+						   asp-all-route-data="Model.RouteValuesForPage(Model.Page - 1)">Previous</a>
+					</li>
+					<li class="page-item disabled">
+						<span class="page-link">Page @Model.Page of @Model.TotalPages</span>
+					</li>
+					<li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+						<a class="page-link" asp-action="Archive"
+						   asp-all-route-data="Model.RouteValuesForPage(Model.Page + 1)">Next</a>
+					</li>
+				</ul>
+			</nav>
+		}
+	</div>
+}

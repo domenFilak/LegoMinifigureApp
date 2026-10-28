@@ -72,6 +72,62 @@ namespace LegoMinifigureApp.Services.Minifigures
             return new PagedResult<MinifigureListItemDto>(items, page, PageSize, totalCount);
         }
 
+        public async Task<PagedResult<MinifigureArchiveItemDto>> GetArchivedPageAsync(
+            MinifigureArchiveQuery query,
+            CancellationToken cancellationToken = default)
+        {
+            //sold or traded figures only; so archived, not in ownership anymore
+            IQueryable<Minifigure> figures = db.Minifigures.Where(m => m.Status != MinifigureStatus.Owned);
+
+            //search string, if typed
+            var search = query.Search?.Trim();
+            if (!string.IsNullOrEmpty(search))
+            {
+                figures = figures.Where(m => m.Name.Contains(search) || m.BrickLinkId.Contains(search));
+            }
+
+            //theme filter if chosen
+            if (query.ThemeId.HasValue)
+            {
+                var themeId = query.ThemeId.Value;
+                figures = figures.Where(m => m.ThemeId == themeId);
+            }
+
+            //status narrowed to sold or traded, "All" => nothing
+            figures = query.Status switch
+            {
+                ArchiveStatusFilter.Sold => figures.Where(m => m.Status == MinifigureStatus.Sold),
+                ArchiveStatusFilter.Traded => figures.Where(m => m.Status == MinifigureStatus.Traded),
+                _ => figures
+            };
+
+            //count and fix page number
+            var totalCount = await figures.CountAsync(cancellationToken);
+            var totalPages = PagedResult<MinifigureArchiveItemDto>.CalculateTotalPages(totalCount, PageSize);
+            var page = Math.Clamp(query.Page, 1, totalPages);
+
+            //load only this page
+            var items = await figures
+                .OrderByDescending(m => m.StatusChangedAt)
+                .ThenByDescending(m => m.Id)
+                .Skip((page - 1) * PageSize)
+                .Take(PageSize)
+                .Select(m => new MinifigureArchiveItemDto(
+                    m.Id,
+                    m.Name,
+                    m.BrickLinkId,
+                    m.Theme.Name,
+                    m.ImagePath,
+                    m.Status,
+                    m.SalePrice,
+                    m.ArchiveNote,
+                    m.StatusChangedAt)
+                )
+                .ToListAsync(cancellationToken);
+
+            return new PagedResult<MinifigureArchiveItemDto>(items, page, PageSize, totalCount);
+        }
+
         public async Task<MinifigureEditDto?> GetForEditAsync(int id, CancellationToken cancellationToken = default)
         {
             return await db.Minifigures

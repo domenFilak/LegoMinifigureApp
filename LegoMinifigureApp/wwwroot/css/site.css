@@ -50,3 +50,7 @@ body {
 .alert[data-auto-dismiss].fade {
     transition: opacity 2s linear;
 }
+
+.archive-note {
+    max-width: 220px;
+}

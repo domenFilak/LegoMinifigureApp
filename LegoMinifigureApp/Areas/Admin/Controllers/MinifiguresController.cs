@@ -21,6 +21,15 @@ namespace LegoMinifigureApp.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Archive([FromQuery] MinifigureArchiveFilterViewModel filter, CancellationToken cancellationToken)
+        {
+            var result = await _minifigureService.GetArchivedPageAsync(filter.ToQuery(), cancellationToken);
+            var themes = await _themeService.GetOptionsAsync(cancellationToken);
+
+            return View(MinifigureArchiveViewModel.From(filter, result, themes));
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Create(CancellationToken cancellationToken)
         {
             var model = new MinifigureFormViewModel();

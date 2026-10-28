@@ -6,6 +6,7 @@ namespace LegoMinifigureApp.Services.Minifigures
     public interface IMinifigureService
     {
         Task<PagedResult<MinifigureListItemDto>> GetOwnedPageAsync(MinifigureListQuery query, CancellationToken cancellationToken = default);
+        Task<PagedResult<MinifigureArchiveItemDto>> GetArchivedPageAsync(MinifigureArchiveQuery query, CancellationToken cancellationToken = default);
         Task<Result<int>> CreateAsync(MinifigureDetailsCommand command, CancellationToken cancellationToken = default);
         Task<MinifigureEditDto?> GetForEditAsync(int id, CancellationToken cancellationToken = default);
         Task<Result> UpdateAsync(int id, byte[] rowVersion, MinifigureDetailsCommand command, CancellationToken cancellationToken = default);

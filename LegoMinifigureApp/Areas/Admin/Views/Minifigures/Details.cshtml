@@ -9,7 +9,9 @@
 		<h1 class="mb-0">@Model.Name</h1>
 		<div class="text-muted">@Model.BrickLinkId · @Model.ThemeName</div>
 	</div>
-	<a asp-action="Index" class="btn btn-outline-secondary">Back to list</a>
+	<a asp-action="@(Model.IsArchived ? "Archive" : "Index")" class="btn btn-outline-secondary">
+		@(Model.IsArchived ? "Back to archive" : "Back to list")
+	</a>
 </div>
 
 @if (Model.IsArchived)
