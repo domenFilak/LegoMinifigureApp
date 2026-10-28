@@ -397,6 +397,40 @@ namespace LegoMinifigureApp.Areas.Admin.Controllers
             return RedirectToAction(nameof(Details), new { id });
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
+        {
+            var figure = await _minifigureService.GetDetailsAsync(id, cancellationToken);
+            if (figure is null)
+            {
+                return NotFound();
+            }
+
+            return View(MinifigureDetailsViewModel.From(figure));
+        }
+
+        [HttpPost]
+        [ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id, CancellationToken cancellationToken)
+        {
+            var result = await _minifigureService.DeleteAsync(id, cancellationToken);
+
+            if (result.IsFailure)
+            {
+                if (result.Error!.Type == ErrorType.NotFound)
+                {
+                    return NotFound();
+                }
+
+                TempData[TempDataKeys.Error] = result.Error.Message;
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            TempData[TempDataKeys.Success] = "Minifigure deleted.";
+            return RedirectToAction(nameof(Index));
+        }
+
         private async Task LoadOptionsAsync(MinifigureFormViewModel model, CancellationToken cancellationToken)
         {
             var themes = await _themeService.GetOptionsAsync(cancellationToken);

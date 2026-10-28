@@ -1,0 +1,43 @@
+﻿@model MinifigureDetailsViewModel
+
+@{
+	ViewData["Title"] = "Delete minifigure";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="row">
+	<div class="col-md-8 col-lg-6">
+		<div class="card shadow-sm border-danger">
+			<div class="card-body">
+				<div class="d-flex gap-3 mb-3">
+					<img src="@Model.ImageUrl" alt="@Model.Name" class="figure-thumb-sm" style="width: 72px; height: 72px;" />
+					<div>
+						<div class="fw-semibold">@Model.Name</div>
+						<div class="small text-muted">@Model.BrickLinkId · @Model.ThemeName · @Model.Status</div>
+					</div>
+				</div>
+
+				<p>
+					Delete <strong>@Model.Name</strong>? It will disappear from your collection,
+					the archive, the dashboard and all listings.
+				</p>
+
+				@if (!Model.IsArchived)
+				{
+					<p class="small text-muted">
+						Deleting is for figures added by mistake. If you sold or traded this figure,
+						use <a asp-action="MarkAsSold" asp-route-id="@Model.Id">Mark as sold</a> or
+						<a asp-action="MarkAsTraded" asp-route-id="@Model.Id">Mark as traded</a> instead,
+						so it stays in your archive.
+					</p>
+				}
+
+				<form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+					<button type="submit" class="btn btn-danger">Delete</button>
+					<a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

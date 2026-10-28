@@ -562,6 +562,28 @@ namespace LegoMinifigureApp.Services.Minifigures
             return Result.Success();
         }
 
+        public async Task<Result> DeleteAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var figure = await db.Minifigures.FirstOrDefaultAsync(m => m.Id == id, cancellationToken);
+            if (figure is null)
+            {
+                return Result.Failure(MinifigureErrors.NotFound(id));
+            }
+
+            figure.SoftDelete(GetUtcNow());
+
+            try
+            {
+                await db.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return Result.Failure(MinifigureErrors.ConcurrencyConflict);
+            }
+
+            return Result.Success();
+        }
+
         private static MinifigureDetailsCommand Normalize(MinifigureDetailsCommand command)
         {
             return command with

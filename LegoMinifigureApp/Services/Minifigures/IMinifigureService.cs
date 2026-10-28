@@ -18,5 +18,6 @@ namespace LegoMinifigureApp.Services.Minifigures
         Task<Result> MarkAsSoldAsync(int id, byte[] rowVersion, decimal salePrice, string? note, CancellationToken cancellationToken = default);
         Task<Result> MarkAsTradedAsync(int id, byte[] rowVersion, string? note, CancellationToken cancellationToken = default);
         Task<Result> RestoreAsync(int id, CancellationToken cancellationToken = default);
+        Task<Result> DeleteAsync(int id, CancellationToken cancellationToken = default);
     }
 }
