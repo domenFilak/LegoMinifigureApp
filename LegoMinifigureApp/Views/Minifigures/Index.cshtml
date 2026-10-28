@@ -1,0 +1,107 @@
+﻿@model MinifigureCollectionIndexViewModel
+
+@{
+	ViewData["Title"] = "Collection";
+}
+
+<div class="mb-4">
+	<h1 class="mb-1">My minifigure collection</h1>
+	<p class="text-muted mb-0">Rare figures I own, some of them for sale or trade.</p>
+</div>
+
+<!--filters, GET form; values go into the URL -->
+<form asp-action="Index" method="get" class="card card-body shadow-sm mb-4">
+	<div class="row g-2 align-items-end">
+		<div class="col-md-5">
+			<label asp-for="Search" class="form-label">Search</label>
+			<input asp-for="Search" class="form-control" placeholder="Name or BrickLink ID" />
+		</div>
+		<div class="col-md-3">
+			<label asp-for="ThemeId" class="form-label">Theme</label>
+			<select asp-for="ThemeId" asp-items="Model.ThemeOptions" class="form-select">
+				<option value="">All themes</option>
+			</select>
+		</div>
+		<div class="col-md-2">
+			<label asp-for="Listing" class="form-label">Show</label>
+			<select asp-for="Listing" asp-items="Model.ListingOptions" class="form-select"></select>
+		</div>
+		<div class="col-md-2 d-flex gap-2">
+			<button type="submit" class="btn btn-primary w-100">Filter</button>
+			@if (Model.HasActiveFilters)
+			{
+				<a asp-action="Index" class="btn btn-outline-secondary" title="Clear filters">✕</a>
+			}
+		</div>
+	</div>
+</form>
+
+@if (!Model.HasItems)
+{
+	<div class="card card-body shadow-sm text-center text-muted">
+		@if (Model.HasActiveFilters)
+		{
+			<p class="mb-2">No figures match your filters.</p>
+			<a asp-action="Index">Show the whole collection</a>
+		}
+		else
+		{
+			<p class="mb-0">The collection is empty for now.</p>
+		}
+	</div>
+}
+else
+{
+	<div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+		@foreach (var figure in Model.Items)
+		{
+			<div class="col">
+				<div class="card h-100 shadow-sm">
+					<img src="@figure.ImageUrl" alt="@figure.Name" class="card-img-top figure-card-img" loading="lazy" />
+					<div class="card-body">
+						<h2 class="h6 card-title mb-1">
+							<a asp-action="Details" asp-route-id="@figure.Id" class="stretched-link text-reset text-decoration-none">@figure.Name</a>
+						</h2>
+						<div class="small text-muted">@figure.BrickLinkId · @figure.ThemeName</div>
+						<div class="small text-muted mb-2">@figure.Condition</div>
+
+						@if (figure.IsForSale)
+						{
+							<span class="badge text-bg-success">For sale · @figure.AskingPriceText</span>
+						}
+						@if (figure.IsForTrade)
+						{
+							<span class="badge text-bg-info">For trade</span>
+						}
+					</div>
+				</div>
+			</div>
+		}
+	</div>
+
+	<!-- Paging -->
+	<div class="d-flex justify-content-between align-items-center mt-4">
+		<span class="text-muted small">
+			Showing @Model.FirstItemNumber–@Model.LastItemNumber of @Model.TotalCount
+		</span>
+
+		@if (Model.TotalPages > 1)
+		{
+			<nav aria-label="Collection pages">
+				<ul class="pagination mb-0">
+					<li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+						<a class="page-link" asp-action="Index"
+						   asp-all-route-data="Model.RouteValuesForPage(Model.Page - 1)">Previous</a>
+					</li>
+					<li class="page-item disabled">
+						<span class="page-link">Page @Model.Page of @Model.TotalPages</span>
+					</li>
+					<li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+						<a class="page-link" asp-action="Index"
+						   asp-all-route-data="Model.RouteValuesForPage(Model.Page + 1)">Next</a>
+					</li>
+				</ul>
+			</nav>
+		}
+	</div>
+}

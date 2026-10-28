@@ -11,6 +11,7 @@ namespace LegoMinifigureApp.Services.Minifigures
         Task<MinifigureEditDto?> GetForEditAsync(int id, CancellationToken cancellationToken = default);
         Task<Result> UpdateAsync(int id, byte[] rowVersion, MinifigureDetailsCommand command, CancellationToken cancellationToken = default);
         Task<MinifigureDetailsDto?> GetDetailsAsync(int id, CancellationToken cancellationToken = default);
+        Task<MinifigureDetailsDto?> GetOwnedDetailsAsync(int id, CancellationToken cancellationToken = default);
         Task<Result> ListForSaleAsync(int id, byte[] rowVersion, decimal askingPrice, CancellationToken cancellationToken = default);
         Task<Result> RemoveFromSaleAsync(int id, CancellationToken cancellationToken = default);
         Task<Result> ListForTradeAsync(int id, byte[] rowVersion, string? tradeNotes, CancellationToken cancellationToken = default);

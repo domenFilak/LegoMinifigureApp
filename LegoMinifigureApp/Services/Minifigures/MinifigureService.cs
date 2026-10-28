@@ -13,7 +13,8 @@ namespace LegoMinifigureApp.Services.Minifigures
         TimeProvider timeProvider,
         IImageStorageService _imageStorageService) : IMinifigureService
     {
-        public const int PageSize = 20;
+        public const int PageSize = 20; //used by archive
+        private const int MaxPageSize = 100;
         private const string ImageFolder = "minifigures";
 
         public async Task<PagedResult<MinifigureListItemDto>> GetOwnedPageAsync(MinifigureListQuery query, CancellationToken cancellationToken = default)
@@ -44,17 +45,18 @@ namespace LegoMinifigureApp.Services.Minifigures
                 _ => figures //all, nothing applied
             };
 
-            //count everything that matches, then fix the page number
+            //count everything that matches
+            var pageSize = Math.Clamp(query.PageSize, 1, MaxPageSize);
             var totalCount = await figures.CountAsync(cancellationToken);
-            var totalPages = PagedResult<MinifigureListItemDto>.CalculateTotalPages(totalCount, PageSize);
+            var totalPages = PagedResult<MinifigureListItemDto>.CalculateTotalPages(totalCount, pageSize);
             var page = Math.Clamp(query.Page, 1, totalPages);
 
             //load only this page and needed columns
             var items = await figures
                 .OrderBy(m => m.Name)
                 .ThenBy(m => m.Id)
-                .Skip((page - 1) * PageSize)
-                .Take(PageSize)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .Select(m => new MinifigureListItemDto(
                     m.Id,
                     m.Name,
@@ -69,7 +71,7 @@ namespace LegoMinifigureApp.Services.Minifigures
                     m.CreatedAt))
                 .ToListAsync(cancellationToken);
 
-            return new PagedResult<MinifigureListItemDto>(items, page, PageSize, totalCount);
+            return new PagedResult<MinifigureListItemDto>(items, page, pageSize, totalCount);
         }
 
         public async Task<PagedResult<MinifigureArchiveItemDto>> GetArchivedPageAsync(
@@ -275,6 +277,18 @@ namespace LegoMinifigureApp.Services.Minifigures
                     m.RowVersion)
                 )
                 .FirstOrDefaultAsync(cancellationToken);
+        }
+
+        public async Task<MinifigureDetailsDto?> GetOwnedDetailsAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var figure = await GetDetailsAsync(id, cancellationToken);
+
+            if (figure is null || figure.Status != MinifigureStatus.Owned)
+            {
+                return null; //archived figures not shown to public as a collection
+            }
+
+            return figure;
         }
 
         public async Task<Result> ListForSaleAsync(int id, byte[] rowVersion, decimal askingPrice, CancellationToken cancellationToken = default)

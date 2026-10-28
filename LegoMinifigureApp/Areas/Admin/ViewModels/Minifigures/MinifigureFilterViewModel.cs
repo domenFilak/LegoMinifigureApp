@@ -4,6 +4,8 @@ namespace LegoMinifigureApp.Areas.Admin.ViewModels.Minifigures
 {
     public class MinifigureFilterViewModel
     {
+        public const int PageSize = 20;
+
         public string? Search { get; set; }
         public int? ThemeId { get; set; }
         public ListingFilter Listing { get; set; }
@@ -11,7 +13,7 @@ namespace LegoMinifigureApp.Areas.Admin.ViewModels.Minifigures
 
         public MinifigureListQuery ToQuery()
         {
-            return new MinifigureListQuery(Search, ThemeId, Listing, Page);
+            return new MinifigureListQuery(Search, ThemeId, Listing, Page, PageSize);
         }
     }
 }

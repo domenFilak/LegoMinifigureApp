@@ -1,0 +1,55 @@
+﻿@model MinifigureCollectionDetailsViewModel
+
+@{
+	ViewData["Title"] = Model.Name;
+}
+
+<a asp-action="Index" class="small text-decoration-none">← Back to collection</a>
+
+<div class="row g-4 mt-1">
+	<div class="col-md-6">
+		<img src="@Model.ImageUrl" alt="@Model.Name" class="figure-detail-img" />
+	</div>
+
+	<div class="col-md-6">
+		<h1 class="mb-1">@Model.Name</h1>
+		<p class="text-muted">@Model.BrickLinkId · @Model.ThemeName</p>
+
+		@if (Model.IsForSale || Model.IsForTrade)
+		{
+			<div class="card card-body bg-light border-0 mb-3">
+				@if (Model.IsForSale)
+				{
+					<div class="mb-1">
+						<span class="badge text-bg-success">For sale</span>
+						<span class="fs-5 fw-semibold ms-1">@Model.AskingPriceText</span>
+					</div>
+				}
+				@if (Model.IsForTrade)
+				{
+					<div>
+						<span class="badge text-bg-info">For trade</span>
+						@if (Model.TradeNotes is not null)
+						{
+							<p class="small mt-2 mb-0 text-preserve-lines">@Model.TradeNotes</p>
+						}
+					</div>
+				}
+			</div>
+		}
+
+		<dl class="row">
+			<dt class="col-sm-4">Condition</dt>
+			<dd class="col-sm-8">@Model.Condition</dd>
+
+			<dt class="col-sm-4">Release year</dt>
+			<dd class="col-sm-8">@(Model.ReleaseYear?.ToString() ?? "–")</dd>
+		</dl>
+
+		@if (Model.Description is not null)
+		{
+			<h2 class="h6 text-uppercase text-muted">About this figure</h2>
+			<p class="text-preserve-lines">@Model.Description</p>
+		}
+	</div>
+</div>

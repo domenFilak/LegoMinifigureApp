@@ -8,7 +8,7 @@ namespace LegoMinifigureApp.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction("Index", "Minifigures");
         }
 
         public IActionResult Privacy()

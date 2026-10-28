@@ -5,6 +5,7 @@
         string? Search,
         int? ThemeId,
         ListingFilter Listing,
-        int Page
+        int Page,
+        int PageSize
     );
 }
