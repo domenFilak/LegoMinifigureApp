@@ -1,10 +1,19 @@
 ﻿using LegoMinifigureApp.Services.Common;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.Formats.Webp;
+using SixLabors.ImageSharp.Processing;
 
 namespace LegoMinifigureApp.Services.Storage
 {
     public class LocalImageStorageService(IWebHostEnvironment environment, ILogger<LocalImageStorageService> logger) : IImageStorageService
     {
         public const long MaxFileSizeBytes = 5 * 1024 * 1024;
+        public const long MaxPixels = 40000000;
+        private const int MaxDimension = 2000; //longest side of stored image in pixels
+        private const int Quality = 90;
         private const string UploadsFolder = "uploads";
 
         private static readonly string[] AllowedExtensions = [".jpg", ".jpeg", ".png", ".webp"];
@@ -50,6 +59,22 @@ namespace LegoMinifigureApp.Services.Storage
             var extension = await DetectExtensionAsync(upload.Content, cancellationToken)
                 ?? throw new InvalidOperationException("The image must be validated before it is saved.");
 
+            upload.Content.Position = 0;
+            using var image = await Image.LoadAsync(upload.Content, cancellationToken);
+
+            //turn pixels the way photo was taken; before orientation info is dropped
+            image.Mutate(x => x.AutoOrient());
+
+            //shrink large photos so longest side is max MaxDimension
+            if (image.Width > MaxDimension || image.Height > MaxDimension)
+            {
+                image.Mutate(x => x.Resize(new ResizeOptions
+                {
+                    Mode = ResizeMode.Max,
+                    Size = new Size(MaxDimension, MaxDimension)
+                }));
+            }
+
             var fileName = $"{Guid.NewGuid():N}{extension}";
             var directory = Path.Combine(environment.WebRootPath, UploadsFolder, folder);
             Directory.CreateDirectory(directory);
@@ -57,7 +82,7 @@ namespace LegoMinifigureApp.Services.Storage
             var fullPath = Path.Combine(directory, fileName);
             await using (var fileStream = new FileStream(fullPath, FileMode.CreateNew))
             {
-                await upload.Content.CopyToAsync(fileStream, cancellationToken);
+                await image.SaveAsync(fileStream, CreateEncoder(extension), cancellationToken);
             }
 
             return $"{UploadsFolder}/{folder}/{fileName}";
@@ -87,7 +112,38 @@ namespace LegoMinifigureApp.Services.Storage
                 return ImageErrors.NotAnImage;
             }
 
+            //check that image can really be read and how big it is
+            try
+            {
+                upload.Content.Position = 0;
+                var info = await Image.IdentifyAsync(upload.Content, cancellationToken);
+
+                if ((long)info.Width * info.Height > MaxPixels)
+                {
+                    return ImageErrors.TooManyPixels(MaxPixels);
+                }
+            }
+            catch (ImageFormatException)
+            {
+                return ImageErrors.NotAnImage;
+            }
+            finally
+            {
+                upload.Content.Position = 0;
+            }
+
             return null;
+        }
+
+        //picks encoder matching the detected format; turns pixels back into a file of one format
+        private static ImageEncoder CreateEncoder(string extension)
+        {
+            return extension switch
+            {
+                ".png" => new PngEncoder { SkipMetadata = true },
+                ".webp" => new WebpEncoder { Quality = Quality, SkipMetadata = true },
+                _ => new JpegEncoder { Quality = Quality, SkipMetadata = true }
+            };
         }
 
         //reads first bytes of the file
