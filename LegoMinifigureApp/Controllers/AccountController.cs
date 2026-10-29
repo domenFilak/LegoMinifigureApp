@@ -1,8 +1,10 @@
 ﻿using LegoMinifigureApp.Entities;
 using LegoMinifigureApp.Models.ViewModels.Account;
+using LegoMinifigureApp.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace LegoMinifigureApp.Controllers
 {
@@ -26,6 +28,7 @@ namespace LegoMinifigureApp.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
+        [EnableRateLimiting(RateLimitPolicies.Login)]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (!ModelState.IsValid)
@@ -43,11 +46,12 @@ namespace LegoMinifigureApp.Controllers
 
             if (result.IsLockedOut)
             {
-                logger.LogWarning("User {Email} locked out.", model.Email);
+                logger.LogWarning("User {Email} locked out. IP: {IpAddress}.", model.Email, HttpContext.Connection.RemoteIpAddress);
                 ModelState.AddModelError(string.Empty, "Too many failed attempts. Try again in 15 minutes.");
                 return View(model);
             }
 
+            logger.LogWarning("Failed login for {Email}. IP: {IpAddress}.", model.Email, HttpContext.Connection.RemoteIpAddress);
             ModelState.AddModelError(string.Empty, "Invalid email or password.");
             return View(model);
         }

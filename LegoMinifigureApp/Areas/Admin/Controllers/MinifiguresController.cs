@@ -11,6 +11,10 @@ namespace LegoMinifigureApp.Areas.Admin.Controllers
         IMinifigureService _minifigureService, 
         IThemeService _themeService) : AdminControllerBase
     {
+        //5 MB image and additional room for other form fields
+        private const long MaxUploadRequestBytes = 6 * 1024 * 1024;
+
+
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery] MinifigureFilterViewModel filter, CancellationToken cancellationToken)
         {
@@ -39,6 +43,7 @@ namespace LegoMinifigureApp.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequestSizeLimit(MaxUploadRequestBytes)]
         public async Task<IActionResult> Create(MinifigureFormViewModel model, CancellationToken cancellationToken)
         {
             if (!ModelState.IsValid)
@@ -77,6 +82,7 @@ namespace LegoMinifigureApp.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequestSizeLimit(MaxUploadRequestBytes)]
         public async Task<IActionResult> Edit(int id, MinifigureFormViewModel model, CancellationToken cancellationToken)
         {
             model.Id = id; //take route id as truth

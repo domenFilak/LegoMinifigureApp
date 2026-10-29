@@ -1,12 +1,15 @@
 using LegoMinifigureApp.Data;
 using LegoMinifigureApp.Data.Seeding;
 using LegoMinifigureApp.Entities;
+using LegoMinifigureApp.Security;
 using LegoMinifigureApp.Services.Dashboard;
 using LegoMinifigureApp.Services.Minifigures;
 using LegoMinifigureApp.Services.Storage;
 using LegoMinifigureApp.Services.Themes;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +36,42 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
     options.ExpireTimeSpan = TimeSpan.FromHours(8);
     options.SlidingExpiration = true;
+
+    options.Cookie.HttpOnly = true;                              
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;     
+    options.Cookie.SameSite = SameSiteMode.Lax;
+});
+
+builder.Services.AddAntiforgery(options =>
+{
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});
+
+builder.Services.Configure<CookieTempDataProviderOptions>(options =>
+{
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        context.HttpContext.Response.ContentType = "text/plain";
+        await context.HttpContext.Response.WriteAsync("Too many login attempts. Please wait a minute and try again.", cancellationToken);
+    };
+
+    //max 10 login attempts per minute from one IP address
+    options.AddPolicy(RateLimitPolicies.Login, httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
 });
 
 builder.Services.Configure<AdminAccountOptions>(builder.Configuration.GetSection(AdminAccountOptions.SectionName));
@@ -61,10 +100,12 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseSecurityHeaders();
 app.UseHttpsRedirection();
 app.UseRequestLocalization("en-US");
 app.UseStaticFiles();
 app.UseRouting();
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();
