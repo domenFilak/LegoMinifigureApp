@@ -12,7 +12,7 @@
 <!--filters, GET form; values go into the URL -->
 <form asp-action="Index" method="get" class="card card-body shadow-sm mb-4">
 	<div class="row g-2 align-items-end">
-		<div class="col-md-5">
+		<div class="col-md-3">
 			<label asp-for="Search" class="form-label">Search</label>
 			<input asp-for="Search" class="form-control" placeholder="Name or BrickLink ID" />
 		</div>
@@ -25,6 +25,10 @@
 		<div class="col-md-2">
 			<label asp-for="Listing" class="form-label">Show</label>
 			<select asp-for="Listing" asp-items="Model.ListingOptions" class="form-select"></select>
+		</div>
+		<div class="col-md-2">
+			<label asp-for="Sorting" class="form-label">Sort</label>
+			<select asp-for="Sorting" asp-items="Model.SortingOptions" class="form-select"></select>
 		</div>
 		<div class="col-md-2 d-flex gap-2">
 			<button type="submit" class="btn btn-primary w-100">Filter</button>

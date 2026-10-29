@@ -5,6 +5,7 @@
         string? Search,
         int? ThemeId,
         ListingFilter Listing,
+        SortingFilter Sorting,
         int Page,
         int PageSize
     );

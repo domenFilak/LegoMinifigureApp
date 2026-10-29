@@ -12,6 +12,7 @@ namespace LegoMinifigureApp.Models.ViewModels.Minifigures
         public string? Search { get; init; }
         public int? ThemeId { get; init; }
         public ListingFilter Listing { get; init; }
+        public SortingFilter Sorting { get; init; }
 
         //cards
         public IReadOnlyList<MinifigureCollectionItemViewModel> Items { get; init; } = [];
@@ -28,10 +29,12 @@ namespace LegoMinifigureApp.Models.ViewModels.Minifigures
         //dropdown options
         public IReadOnlyList<SelectListItem> ThemeOptions { get; init; } = [];
         public IReadOnlyList<SelectListItem> ListingOptions { get; init; } = [];
+        public IReadOnlyList<SelectListItem> SortingOptions { get; init; } = [];
+
 
         public bool HasItems => Items.Count > 0;
 
-        public bool HasActiveFilters => !string.IsNullOrWhiteSpace(Search) || ThemeId.HasValue || Listing != ListingFilter.All;
+        public bool HasActiveFilters => !string.IsNullOrWhiteSpace(Search) || ThemeId.HasValue || Listing != ListingFilter.All || Sorting != SortingFilter.Name;
 
         public Dictionary<string, string> RouteValuesForPage(int page)
         {
@@ -52,6 +55,11 @@ namespace LegoMinifigureApp.Models.ViewModels.Minifigures
                 values["listing"] = Listing.ToString();
             }
 
+            if (Sorting != SortingFilter.Name)
+            {
+                values["sorting"] = Sorting.ToString();
+            }
+
             values["page"] = page.ToString();
 
             return values;
@@ -67,6 +75,7 @@ namespace LegoMinifigureApp.Models.ViewModels.Minifigures
                 Search = filter.Search,
                 ThemeId = filter.ThemeId,
                 Listing = filter.Listing,
+                Sorting = filter.Sorting,
 
                 Items = result.Items.Select(MinifigureCollectionItemViewModel.From).ToList(),
 
@@ -87,6 +96,12 @@ namespace LegoMinifigureApp.Models.ViewModels.Minifigures
                     new SelectListItem("Everything", nameof(ListingFilter.All)),
                     new SelectListItem("For sale", nameof(ListingFilter.ForSale)),
                     new SelectListItem("For trade", nameof(ListingFilter.ForTrade))
+                ],
+
+                SortingOptions = 
+                [
+                    new SelectListItem("Name (A-Z)", nameof(SortingFilter.Name)),
+                    new SelectListItem("Newest first", nameof(SortingFilter.DateOfAddition))
                 ]
             };
         }

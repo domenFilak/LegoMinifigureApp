@@ -13,7 +13,7 @@ namespace LegoMinifigureApp.Areas.Admin.ViewModels.Minifigures
 
         public MinifigureListQuery ToQuery()
         {
-            return new MinifigureListQuery(Search, ThemeId, Listing, Page, PageSize);
+            return new MinifigureListQuery(Search, ThemeId, Listing, SortingFilter.Name, Page, PageSize);
         }
     }
 }

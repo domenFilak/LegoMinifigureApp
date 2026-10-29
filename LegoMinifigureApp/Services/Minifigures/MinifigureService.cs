@@ -51,10 +51,19 @@ namespace LegoMinifigureApp.Services.Minifigures
             var totalPages = PagedResult<MinifigureListItemDto>.CalculateTotalPages(totalCount, pageSize);
             var page = Math.Clamp(query.Page, 1, totalPages);
 
-            //load only this page and needed columns
-            var items = await figures
-                .OrderBy(m => m.Name)
-                .ThenBy(m => m.Id)
+            //determine sorting
+            var sortedFigures = query.Sorting switch
+            {
+                SortingFilter.DateOfAddition => figures
+                    .OrderByDescending(m => m.CreatedAt)
+                    .ThenBy(m => m.Id),
+
+                _ => figures
+                    .OrderBy(m => m.Name)
+                    .ThenBy(m => m.Id)
+            };
+
+            var items = await sortedFigures
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Select(m => new MinifigureListItemDto(
