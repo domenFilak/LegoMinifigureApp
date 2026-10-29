@@ -75,6 +75,11 @@ namespace LegoMinifigureApp.Services.Storage
                 }));
             }
 
+            //remove metadata from image
+            image.Metadata.ExifProfile = null;   //camera, date, GPS location
+            image.Metadata.XmpProfile = null;    //editing software data, maybe sometimes location
+            image.Metadata.IptcProfile = null;   //captions, author, copyright, location
+
             var fileName = $"{Guid.NewGuid():N}{extension}";
             var directory = Path.Combine(environment.WebRootPath, UploadsFolder, folder);
             Directory.CreateDirectory(directory);
