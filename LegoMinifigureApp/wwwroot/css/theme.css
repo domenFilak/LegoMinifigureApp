@@ -1,0 +1,140 @@
+﻿/* brick palette, light mode */
+:root,
+[data-bs-theme="light"] {
+    /*fill colors; used for backgrounds with white or dark text on top of it*/
+    --brick-red-fill: #C91A09;
+    --brick-red-fill-hover: #A8150A;
+    --brick-red-fill-active: #8F1208;
+    --brick-yellow: #F2CD37;
+    --brick-blue-fill: #0055BF;
+    --brick-green-fill: #237841;
+    --brick-ink-fill: #1B2A34;
+    /*text and accent colors; used as text or borders on the page background */
+    --brick-red-text: #C91A09;
+    --brick-blue-text: #0055BF;
+    /*surface colors */
+    --brick-page: #F4F1EA; /*warm offwhite page */
+    --brick-surface: #FFFFFF; /*cards, tables, inputs */
+    --brick-surface-muted: #EEEAE0;
+    --brick-border: #D9D4C7;
+    --brick-ink: #1B2A34;
+    /*navbar and footer */
+    --brick-navbar-public: #C91A09;
+    --brick-navbar-public-edge: #9E1407;
+    --brick-navbar-admin: #1B2A34;
+    --brick-footer: #1B2A34;
+    /*bootstraps variables, pointed at the palette */
+    --bs-body-bg: var(--brick-page);
+    --bs-body-color: var(--brick-ink);
+    --bs-emphasis-color: #0E161C;
+    --bs-secondary-bg: var(--brick-surface-muted);
+    --bs-tertiary-bg: #F8F6F1;
+    --bs-border-color: var(--brick-border);
+    --bs-link-color: var(--brick-blue-text);
+    --bs-link-color-rgb: 0, 85, 191;
+    --bs-link-hover-color: #00418F;
+    --bs-link-hover-color-rgb: 0, 65, 143;
+    --bs-primary: var(--brick-red-text);
+    --bs-primary-rgb: 201, 26, 9;
+    --bs-success: var(--brick-green-fill);
+    --bs-success-rgb: 35, 120, 65;
+    --bs-focus-ring-color: rgba(0, 85, 191, 0.35);
+}
+
+/* brick palette, dark mode */
+[data-bs-theme="dark"] {
+    /*text colors brighter, so they stay readable on darker background */
+    --brick-red-text: #FF5A4E;
+    --brick-blue-text: #4C9BE8;
+    --brick-page: #15191D;
+    --brick-surface: #1F252B;
+    --brick-surface-muted: #262D34;
+    --brick-border: #343C44;
+    --brick-ink: #E7EAEE;
+    --brick-navbar-public: #A3170A;
+    --brick-navbar-public-edge: #7A1107;
+    --brick-navbar-admin: #0F171D;
+    --brick-footer: #0F171D;
+    --bs-body-bg: var(--brick-page);
+    --bs-body-color: var(--brick-ink);
+    --bs-emphasis-color: #FFFFFF;
+    --bs-secondary-bg: var(--brick-surface-muted);
+    --bs-tertiary-bg: #1B2025;
+    --bs-border-color: var(--brick-border);
+    --bs-link-color: var(--brick-blue-text);
+    --bs-link-color-rgb: 76, 155, 232;
+    --bs-link-hover-color: #7DB6EE;
+    --bs-link-hover-color-rgb: 125, 182, 238;
+    --bs-primary: var(--brick-red-text);
+    --bs-primary-rgb: 255, 90, 78;
+    --bs-success: #5AAE6E;
+    --bs-success-rgb: 90, 174, 110;
+    --bs-focus-ring-color: rgba(76, 155, 232, 0.4);
+}
+
+/*bootstrap components that use page color by default; give them surface color, so they stand out from the page*/
+.card {
+    --bs-card-bg: var(--brick-surface);
+}
+
+.table {
+    --bs-table-bg: var(--brick-surface);
+}
+
+    .table > thead {
+        --bs-table-bg: var(--bs-secondary-bg);
+    }
+
+.form-control,
+.form-select {
+    background-color: var(--brick-surface);
+}
+
+.pagination {
+    --bs-pagination-bg: var(--brick-surface);
+    --bs-pagination-color: var(--bs-link-color);
+    --bs-pagination-active-bg: var(--brick-red-fill);
+    --bs-pagination-active-border-color: var(--brick-red-fill);
+    --bs-pagination-disabled-bg: var(--brick-surface);
+}
+
+/*buttons; red instead of bootstrap blue */
+.btn-primary {
+    --bs-btn-color: #FFFFFF;
+    --bs-btn-bg: var(--brick-red-fill);
+    --bs-btn-border-color: var(--brick-red-fill);
+    --bs-btn-hover-color: #FFFFFF;
+    --bs-btn-hover-bg: var(--brick-red-fill-hover);
+    --bs-btn-hover-border-color: var(--brick-red-fill-hover);
+    --bs-btn-active-color: #FFFFFF;
+    --bs-btn-active-bg: var(--brick-red-fill-active);
+    --bs-btn-active-border-color: var(--brick-red-fill-active);
+    --bs-btn-disabled-bg: var(--brick-red-fill);
+    --bs-btn-disabled-border-color: var(--brick-red-fill);
+    --bs-btn-focus-shadow-rgb: 201, 26, 9;
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--brick-red-text);
+    --bs-btn-border-color: var(--brick-red-text);
+    --bs-btn-hover-color: #FFFFFF;
+    --bs-btn-hover-bg: var(--brick-red-fill);
+    --bs-btn-hover-border-color: var(--brick-red-fill);
+    --bs-btn-active-color: #FFFFFF;
+    --bs-btn-active-bg: var(--brick-red-fill-hover);
+    --bs-btn-active-border-color: var(--brick-red-fill-hover);
+    --bs-btn-focus-shadow-rgb: 201, 26, 9;
+}
+
+/*form focus; brick blue instead of bootstraps fixed blue */
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+    border-color: var(--brick-blue-text);
+    box-shadow: 0 0 0 0.25rem var(--bs-focus-ring-color);
+}
+
+.form-check-input:checked {
+    background-color: var(--brick-red-fill);
+    border-color: var(--brick-red-fill);
+}

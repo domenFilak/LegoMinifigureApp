@@ -85,7 +85,7 @@
 					@if (Model.IsForSale)
 					{
 						<p class="fs-5 mb-3">
-							<span class="badge text-bg-success">For sale · @Model.AskingPriceText</span>
+							<span class="badge badge-brick badge-sale">For sale · @Model.AskingPriceText</span>
 						</p>
 						<a asp-action="Sale" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-primary">Change price</a>
 						<form asp-action="RemoveFromSale" asp-route-id="@Model.Id" method="post" class="d-inline">
@@ -107,7 +107,7 @@
 
 					@if (Model.IsForTrade)
 					{
-						<p class="mb-2"><span class="badge text-bg-info">For trade</span></p>
+						<span class="badge badge-brick badge-trade">For trade</span>
 						@if (Model.TradeNotes is not null)
 						{
 							<p class="small mb-3">@Model.TradeNotes</p>

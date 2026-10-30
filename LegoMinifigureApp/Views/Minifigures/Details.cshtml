@@ -17,18 +17,18 @@
 
 		@if (Model.IsForSale || Model.IsForTrade)
 		{
-			<div class="card card-body bg-light border-0 mb-3">
+			<div class="listing-box mb-3">
 				@if (Model.IsForSale)
 				{
 					<div class="mb-1">
-						<span class="badge text-bg-success">For sale</span>
+						<span class="badge badge-brick badge-sale">For sale</span>
 						<span class="fs-5 fw-semibold ms-1">@Model.AskingPriceText</span>
 					</div>
 				}
 				@if (Model.IsForTrade)
 				{
 					<div>
-						<span class="badge text-bg-info">For trade</span>
+						<span class="badge badge-brick badge-trade">For trade</span>
 						@if (Model.TradeNotes is not null)
 						{
 							<p class="small mt-2 mb-0 text-preserve-lines">@Model.TradeNotes</p>

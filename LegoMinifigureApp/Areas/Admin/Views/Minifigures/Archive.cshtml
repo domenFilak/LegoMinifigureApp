@@ -55,7 +55,7 @@ else
 	<div class="card shadow-sm">
 		<div class="table-responsive">
 			<table class="table table-hover align-middle mb-0">
-				<thead class="table-light">
+				<thead>
 					<tr>
 						<th class="col-thumb"></th>
 						<th>Name</th>
@@ -78,7 +78,7 @@ else
 							</td>
 							<td>@figure.ThemeName</td>
 							<td>
-								<span class="badge @(figure.IsSold ? "text-bg-success" : "text-bg-info")">@figure.Status</span>
+								<span class="badge badge-brick @(figure.IsSold ? "badge-sold" : "badge-traded")">@figure.Status</span>
 							</td>
 							<td class="text-end">@(figure.SalePriceText ?? "–")</td>
 							<td>

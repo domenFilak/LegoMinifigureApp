@@ -4,9 +4,8 @@
 	ViewData["Title"] = "Collection";
 }
 
-<div class="mb-4">
+<div class="page-hero mb-4">
 	<h1 class="mb-1">My minifigure collection</h1>
-	<p class="text-muted mb-0">Rare figures I own, some of them for sale or trade.</p>
 </div>
 
 <!--filters, GET form; values go into the URL -->
@@ -60,7 +59,7 @@ else
 		@foreach (var figure in Model.Items)
 		{
 			<div class="col">
-				<div class="card h-100 shadow-sm">
+				<div class="card brick-card h-100">
 					<img src="@figure.ImageUrl" alt="@figure.Name" class="card-img-top figure-card-img" loading="lazy" />
 					<div class="card-body">
 						<h2 class="h6 card-title mb-1">
@@ -71,11 +70,11 @@ else
 
 						@if (figure.IsForSale)
 						{
-							<span class="badge text-bg-success">For sale · @figure.AskingPriceText</span>
+							<span class="badge badge-brick badge-sale">For sale · @figure.AskingPriceText</span>
 						}
 						@if (figure.IsForTrade)
 						{
-							<span class="badge text-bg-info">For trade</span>
+							<span class="badge badge-brick badge-trade">For trade</span>
 						}
 					</div>
 				</div>

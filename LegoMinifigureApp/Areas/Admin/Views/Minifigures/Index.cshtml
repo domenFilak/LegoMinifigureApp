@@ -55,7 +55,7 @@ else
 	<div class="card shadow-sm">
 		<div class="table-responsive">
 			<table class="table table-hover align-middle mb-0">
-				<thead class="table-light">
+				<thead>
 					<tr>
 						<th class="col-thumb"></th>
 						<th>Name</th>
@@ -80,13 +80,13 @@ else
 							<td>
 								@if (figure.IsForSale)
 								{
-									<span class="badge text-bg-success" data-bs-toggle="tooltip" title="@figure.SaleTooltip">
+									<span class="badge badge-brick badge-sale" data-bs-toggle="tooltip" title="@figure.SaleTooltip">
 										For sale · @figure.AskingPriceText
 									</span>
 								}
 								@if (figure.IsForTrade)
 								{
-									<span class="badge text-bg-info" data-bs-toggle="tooltip" title="@figure.TradeTooltip">
+									<span class="badge badge-brick badge-trade" data-bs-toggle="tooltip" title="@figure.TradeTooltip">
 										For trade
 									</span>
 								}

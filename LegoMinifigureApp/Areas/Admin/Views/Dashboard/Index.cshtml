@@ -10,7 +10,7 @@
 
 	<!--short summary of the current collection-->
 	<div class="col-lg-4">
-		<div class="card h-100 shadow-sm">
+		<div class="card card-accent-red h-100 shadow-sm">
 			<div class="card-body">
 				<h2 class="h6 text-uppercase text-muted">Collection</h2>
 				<p class="display-5 fw-bold mb-0">@Model.OwnedCount</p>
@@ -58,19 +58,21 @@
 		</div>
 	</div>
 
-	<!--minifigures that are gone (arvhived); so were sold or traded-->
+	<!--minifigures that are gone (archived); so were sold or traded-->
 	<div class="col-lg-4">
-		<div class="card-body">
-			<h2 class="h6 text-uppercase text-muted">Archive</h2>
-			<a asp-area="Admin" asp-controller="Minifigures" asp-action="Archive" class="text-decoration-none text-reset">
-				<p class="display-5 fw-bold mb-0">@Model.ArchivedCount</p>
-				<p class="text-muted">figures archived</p>
-			</a>
-			<p class="mb-0">
-				<a asp-area="Admin" asp-controller="Minifigures" asp-action="Archive" asp-route-status="Sold">Sold: <strong>@Model.SoldCount</strong></a>
-				·
-				<a asp-area="Admin" asp-controller="Minifigures" asp-action="Archive" asp-route-status="Traded">Traded: <strong>@Model.TradedCount</strong></a>
-			</p>
+		<div class="card card-accent-yellow h-100 shadow-sm">
+			<div class="card-body">
+				<h2 class="h6 text-uppercase text-muted">Archive</h2>
+				<a asp-area="Admin" asp-controller="Minifigures" asp-action="Archive" class="text-decoration-none text-reset">
+					<p class="display-5 fw-bold mb-0">@Model.ArchivedCount</p>
+					<p class="text-muted">figures archived</p>
+				</a>
+				<p class="mb-0">
+					<a asp-area="Admin" asp-controller="Minifigures" asp-action="Archive" asp-route-status="Sold">Sold: <strong>@Model.SoldCount</strong></a>
+					·
+					<a asp-area="Admin" asp-controller="Minifigures" asp-action="Archive" asp-route-status="Traded">Traded: <strong>@Model.TradedCount</strong></a>
+				</p>
+			</div>
 		</div>
 	</div>
 

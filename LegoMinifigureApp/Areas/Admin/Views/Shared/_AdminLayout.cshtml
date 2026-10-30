@@ -1,18 +1,21 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>@ViewData["Title"] – Admin</title>
+	<script src="~/js/theme.js" asp-append-version="true"></script>
 	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="~/css/theme.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body class="bg-light">
+<body>
 	<header>
-		<nav class="navbar navbar-expand-sm navbar-dark bg-dark mb-4">
+		<nav class="navbar navbar-expand-sm navbar-admin mb-4" data-bs-theme="dark">
 			<div class="container">
 				<a class="navbar-brand" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
-					Minifigures · Admin
+					<span class="brand-brick brand-brick-red" aria-hidden="true"></span>Minifigures
+					<span class="badge badge-brick badge-sale ms-1 align-middle">ADMIN</span>
 				</a>
 				<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
 						data-bs-target="#adminNav" aria-controls="adminNav"
@@ -35,6 +38,12 @@
 						</li>
 					</ul>
 					<ul class="navbar-nav">
+						<li class="nav-item">
+							<button type="button" class="nav-link btn btn-link theme-toggle" data-theme-toggle>
+								<span data-theme-icon aria-hidden="true"></span>
+								<span data-theme-label></span>
+							</button>
+						</li>
 						<li class="nav-item">
 							<a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">View public site</a>
 						</li>
