@@ -1,6 +1,9 @@
 ﻿/* brick palette, light mode */
 :root,
 [data-bs-theme="light"] {
+    /*fonts; same in light and dark mode */
+    --bs-body-font-family: "Nunito Variable", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --brick-heading-font: "Fredoka Variable", "Nunito Variable", system-ui, sans-serif;
     /*fill colors; used for backgrounds with white or dark text on top of it*/
     --brick-red-fill: #C91A09;
     --brick-red-fill-hover: #A8150A;
@@ -137,4 +140,13 @@
 .form-check-input:checked {
     background-color: var(--brick-red-fill);
     border-color: var(--brick-red-fill);
+}
+
+/*font for headings, brand, big numbers and badges*/
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6,
+.display-1, .display-2, .display-3, .display-4, .display-5, .display-6,
+.navbar-brand,
+.badge-brick {
+    font-family: var(--brick-heading-font);
 }

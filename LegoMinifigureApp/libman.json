@@ -1,0 +1,14 @@
+{
+  "version": "3.0",
+  "defaultProvider": "jsdelivr",
+  "libraries": [
+    {
+      "library": "@fontsource-variable/nunito@latest",
+      "destination": "wwwroot/lib/@fontsource-variable/nunito/"
+    },
+    {
+      "library": "@fontsource-variable/fredoka@latest",
+      "destination": "wwwroot/lib/@fontsource-variable/fredoka/"
+    }
+  ]
+}

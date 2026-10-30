@@ -10,8 +10,8 @@ html {
 }
 
 h1, .h1, h2, .h2 {
-    font-weight: 800;
-    letter-spacing: -0.01em;
+    font-weight: 600;
+    letter-spacing: 0;
 }
 
 .form-floating > .form-control-plaintext::placeholder,
@@ -130,7 +130,7 @@ h1, .h1, h2, .h2 {
 
 /*small 2x1 brick drawn in CSS*/
 .navbar-brand {
-    font-weight: 800;
+    font-weight: 600;
 }
 
 .brand-brick {
