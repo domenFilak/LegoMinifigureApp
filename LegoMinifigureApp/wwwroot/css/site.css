@@ -73,3 +73,24 @@ body {
 .text-preserve-lines {
     white-space: pre-line;
 }
+
+/*for removal of inline style=""*/
+.col-thumb {
+    width: 64px;
+}
+
+.figure-thumb-preview {
+    height: 160px;
+}
+
+.figure-thumb-lg {
+    height: 280px;
+}
+
+.figure-thumb-md {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+}

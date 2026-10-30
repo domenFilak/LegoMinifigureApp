@@ -62,7 +62,7 @@
 
 					@if (Model.HasCurrentImage)
 					{
-						<img src="@Model.CurrentImageUrl" alt="Current image of @Model.Name" class="figure-thumb mb-2" style="height: 160px;" />
+						<img src="@Model.CurrentImageUrl" alt="Current image of @Model.Name" class="figure-thumb figure-thumb-preview mb-2" />
 						<div class="form-check mb-3">
 							<input asp-for="RemoveImage" class="form-check-input" />
 							<label asp-for="RemoveImage" class="form-check-label"></label>
