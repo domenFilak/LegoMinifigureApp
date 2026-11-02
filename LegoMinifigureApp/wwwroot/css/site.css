@@ -1,12 +1,6 @@
 /*base*/
-html {
-    font-size: 14px;
-}
-
-@media (min-width: 768px) {
-    html {
-        font-size: 16px;
-    }
+body {
+    overflow-wrap: break-word;
 }
 
 h1, .h1, h2, .h2 {
@@ -47,7 +41,9 @@ h1, .h1, h2, .h2 {
 }
 
 .figure-card-img {
-    height: 180px;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
     object-fit: contain;
     background-color: var(--bs-tertiary-bg);
     padding: 0.5rem;
@@ -55,7 +51,7 @@ h1, .h1, h2, .h2 {
 
 .figure-detail-img {
     width: 100%;
-    max-height: 480px;
+    max-height: min(30rem, 70vh);
     object-fit: contain;
     background-color: var(--bs-tertiary-bg);
     border: 2px solid var(--bs-border-color);
@@ -205,12 +201,18 @@ h1, .h1, h2, .h2 {
 
 /*public; page header with faint stud pattern*/
 .page-hero {
-    padding: 1.5rem;
+    padding: 1rem;
     background-color: var(--brick-surface);
     background-image: radial-gradient(circle, rgba(201, 26, 9, 0.08) 0 0.35rem, transparent 0.36rem);
     background-size: 1.5rem 1.5rem;
     border: 2px solid var(--bs-border-color);
     border-radius: 0.75rem;
+}
+
+@media (min-width: 768px) {
+    .page-hero {
+        padding: 1.5rem;
+    }
 }
 
 /*public; cards as bricks with studs on top*/
@@ -234,7 +236,7 @@ h1, .h1, h2, .h2 {
         background-repeat: repeat-x;
     }
 
-@media (prefers-reduced-motion: no-preference) {
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
     .brick-card {
         transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
