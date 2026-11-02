@@ -17,7 +17,7 @@ namespace LegoMinifigureApp.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.13")
+                .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -176,9 +176,27 @@ namespace LegoMinifigureApp.Data.Migrations
 
                     b.HasIndex("BrickLinkId");
 
-                    b.HasIndex("Status");
+                    b.HasIndex("StatusChangedAt", "Id")
+                        .IsDescending()
+                        .HasDatabaseName("IX_Minifigures_Archive")
+                        .HasFilter("[IsDeleted] = 0 AND [Status] <> N'Owned'");
 
-                    b.HasIndex("ThemeId");
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("StatusChangedAt", "Id"), new[] { "Status", "ThemeId", "Name", "BrickLinkId" });
+
+                    b.HasIndex("ThemeId", "Status")
+                        .HasDatabaseName("IX_Minifigures_ThemeId_Status")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("Status", "CreatedAt", "Id")
+                        .IsDescending(false, true, true)
+                        .HasDatabaseName("IX_Minifigures_Status_CreatedAt")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("Status", "Name", "Id")
+                        .HasDatabaseName("IX_Minifigures_Status_Name")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Status", "Name", "Id"), new[] { "ThemeId", "BrickLinkId", "IsForSale", "IsForTrade" });
 
                     b.ToTable("Minifigures", t =>
                         {

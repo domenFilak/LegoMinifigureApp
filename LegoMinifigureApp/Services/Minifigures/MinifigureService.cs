@@ -56,7 +56,7 @@ namespace LegoMinifigureApp.Services.Minifigures
             {
                 SortingFilter.DateOfAddition => figures
                     .OrderByDescending(m => m.CreatedAt)
-                    .ThenBy(m => m.Id),
+                    .ThenByDescending(m => m.Id),
 
                 _ => figures
                     .OrderBy(m => m.Name)

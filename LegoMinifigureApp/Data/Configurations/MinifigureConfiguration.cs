@@ -44,7 +44,30 @@ namespace LegoMinifigureApp.Data.Configurations
 
             //indexes
             builder.HasIndex(m => m.BrickLinkId); //not unique, duplicates allowed
-            builder.HasIndex(m => m.Status);
+
+            //owned minifigs ordered by name, default
+            builder.HasIndex(m => new { m.Status, m.Name, m.Id })
+                .HasDatabaseName("IX_Minifigures_Status_Name")
+                .HasFilter("[IsDeleted] = 0")
+                .IncludeProperties(m => new { m.ThemeId, m.BrickLinkId, m.IsForSale, m.IsForTrade });
+
+            //owned minifigs by created at, newest first sort or recently added
+            builder.HasIndex(m => new { m.Status, m.CreatedAt, m.Id })
+                .HasDatabaseName("IX_Minifigures_Status_CreatedAt")
+                .IsDescending(false, true, true)
+                .HasFilter("[IsDeleted] = 0");
+
+            //archived minifigures by latest status change; most recent sale/trade first
+            builder.HasIndex(m => new { m.StatusChangedAt, m.Id })
+                .HasDatabaseName("IX_Minifigures_Archive")
+                .IsDescending(true, true)
+                .HasFilter("[IsDeleted] = 0 AND [Status] <> N'Owned'")
+                .IncludeProperties(m => new { m.Status, m.ThemeId, m.Name, m.BrickLinkId });
+
+            //minifigures per theme
+            builder.HasIndex(m => new { m.ThemeId, m.Status })
+                .HasDatabaseName("IX_Minifigures_ThemeId_Status")
+                .HasFilter("[IsDeleted] = 0");
 
             builder.HasQueryFilter(QueryFilters.SoftDelete, m => !m.IsDeleted);
 
