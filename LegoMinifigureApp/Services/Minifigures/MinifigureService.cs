@@ -1,10 +1,12 @@
 ﻿using LegoMinifigureApp.Data;
+using LegoMinifigureApp.Data.Interceptors;
 using LegoMinifigureApp.Entities;
 using LegoMinifigureApp.Entities.Enums;
 using LegoMinifigureApp.Services.Common;
 using LegoMinifigureApp.Services.Minifigures.Dtos;
 using LegoMinifigureApp.Services.Storage;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 
 namespace LegoMinifigureApp.Services.Minifigures
 {
@@ -16,17 +18,27 @@ namespace LegoMinifigureApp.Services.Minifigures
         public const int PageSize = 20; //used by archive
         private const int MaxPageSize = 100;
         private const string ImageFolder = "minifigures";
+        private const int MinSearchWordLength = 2;
+        private const int MaxSearchWords = 5;
 
         public async Task<PagedResult<MinifigureListItemDto>> GetOwnedPageAsync(MinifigureListQuery query, CancellationToken cancellationToken = default)
         {
             //build query start - owned figures only, soft deleted filtered out automatically
             IQueryable<Minifigure> figures = db.Minifigures.Where(m => m.Status == MinifigureStatus.Owned);
 
-            //apply search
-            var search = query.Search?.Trim();
-            if (!string.IsNullOrEmpty(search))
+            //apply search; fulltext, matches words that start with what user typed
+            var isSearching = false;
+            if (!string.IsNullOrWhiteSpace(query.Search))
             {
-                figures = figures.Where(m => m.Name.Contains(search) || m.BrickLinkId.Contains(search));
+                var searchCondition = BuildFullTextSearchCondition(query.Search);
+                if (searchCondition is not null)
+                {
+                    figures = figures.Where(m =>
+                        EF.Functions.Contains(m.Name, searchCondition) ||
+                        EF.Functions.Contains(m.BrickLinkId, searchCondition));
+
+                    isSearching = true;
+                }
             }
 
             //apply theme
@@ -63,9 +75,18 @@ namespace LegoMinifigureApp.Services.Minifigures
                     .ThenBy(m => m.Id)
             };
 
-            var items = await sortedFigures
+            //only this page
+            var pageQuery = sortedFigures
                 .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+                .Take(pageSize);
+
+            //when searching, tag query so interceptor adds the row goal hint
+            if (isSearching)
+            {
+                pageQuery = pageQuery.TagWith(FullTextSearchHintInterceptor.Tag);
+            }
+
+            var items = await pageQuery
                 .Select(m => new MinifigureListItemDto(
                     m.Id,
                     m.Name,
@@ -90,11 +111,19 @@ namespace LegoMinifigureApp.Services.Minifigures
             //sold or traded figures only; so archived, not in ownership anymore
             IQueryable<Minifigure> figures = db.Minifigures.Where(m => m.Status != MinifigureStatus.Owned);
 
-            //search string, if typed
-            var search = query.Search?.Trim();
-            if (!string.IsNullOrEmpty(search))
+            //search string, if typed; full text
+            var isSearching = false;
+            if (!string.IsNullOrWhiteSpace(query.Search))
             {
-                figures = figures.Where(m => m.Name.Contains(search) || m.BrickLinkId.Contains(search));
+                var searchCondition = BuildFullTextSearchCondition(query.Search);
+                if (searchCondition is not null)
+                {
+                    figures = figures.Where(m =>
+                        EF.Functions.Contains(m.Name, searchCondition) ||
+                        EF.Functions.Contains(m.BrickLinkId, searchCondition));
+
+                    isSearching = true;
+                }
             }
 
             //theme filter if chosen
@@ -117,12 +146,20 @@ namespace LegoMinifigureApp.Services.Minifigures
             var totalPages = PagedResult<MinifigureArchiveItemDto>.CalculateTotalPages(totalCount, PageSize);
             var page = Math.Clamp(query.Page, 1, totalPages);
 
-            //load only this page
-            var items = await figures
+            //only this page, newest status change first
+            var pageQuery = figures
                 .OrderByDescending(m => m.StatusChangedAt)
                 .ThenByDescending(m => m.Id)
                 .Skip((page - 1) * PageSize)
-                .Take(PageSize)
+                .Take(PageSize);
+
+            //when searching, tag query so interceptor adds the row goal hint
+            if (isSearching)
+            {
+                pageQuery = pageQuery.TagWith(FullTextSearchHintInterceptor.Tag);
+            }
+
+            var items = await pageQuery
                 .Select(m => new MinifigureArchiveItemDto(
                     m.Id,
                     m.Name,
@@ -689,6 +726,51 @@ namespace LegoMinifigureApp.Services.Minifigures
         private DateTime GetUtcNow()
         {
             return timeProvider.GetUtcNow().UtcDateTime;
+        }
+
+        //only letters and digits left, other cleaned
+        //min 2 characters, max 5 words for search in search bar
+        private static string? BuildFullTextSearchCondition(string search)
+        {
+            var cleaned = new StringBuilder(search.Length);
+
+            foreach (var character in search)
+            {
+                if (char.IsLetterOrDigit(character))
+                {
+                    cleaned.Append(character);
+                }
+                else
+                {
+                    cleaned.Append(' ');
+                }
+            }
+
+            var words = cleaned.ToString().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+            var terms = new List<string>();
+
+            foreach (var word in words)
+            {
+                if (word.Length < MinSearchWordLength)
+                {
+                    continue;
+                }
+
+                terms.Add($"\"{word}*\"");
+
+                if (terms.Count == MaxSearchWords)
+                {
+                    break;
+                }
+            }
+
+            if (terms.Count == 0)
+            {
+                return null;
+            }
+
+            return string.Join(" AND ", terms);
         }
     }
 }

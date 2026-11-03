@@ -1,4 +1,5 @@
 using LegoMinifigureApp.Data;
+using LegoMinifigureApp.Data.Interceptors;
 using LegoMinifigureApp.Data.Seeding;
 using LegoMinifigureApp.Entities;
 using LegoMinifigureApp.Security;
@@ -18,7 +19,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton(TimeProvider.System);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+           .AddInterceptors(new FullTextSearchHintInterceptor()));
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
