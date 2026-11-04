@@ -1,4 +1,5 @@
 using LegoMinifigureApp.Models;
+using LegoMinifigureApp.Models.ViewModels.Errors;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -16,10 +17,30 @@ namespace LegoMinifigureApp.Controllers
             return View();
         }
 
+        //crashes (500); called by UseExceptionHandler
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            Response.StatusCode = StatusCodes.Status500InternalServerError;
+
+            var referenceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
+            var model = ErrorPageViewModel.ForServerError(referenceId);
+
+            return View("ErrorPage", model);
+        }
+
+        //404 and other error status codes; called by UseStatusCodePagesWithReExecute
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Status(int id)
+        {
+            //only real error codes; anything else typed into url treated as "not found"
+            var statusCode = id >= 400 && id <= 599 ? id : StatusCodes.Status404NotFound;
+
+            Response.StatusCode = statusCode;
+
+            var model = ErrorPageViewModel.ForStatusCode(statusCode);
+
+            return View("ErrorPage", model);
         }
     }
 }

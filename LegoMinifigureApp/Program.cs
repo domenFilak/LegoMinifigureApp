@@ -107,6 +107,10 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseSecurityHeaders();
+
+//404 and other error codes without content show our own error page
+app.UseStatusCodePagesWithReExecute("/Home/Status/{0}");
+
 app.UseHttpsRedirection();
 app.UseRequestLocalization("en-US");
 //file names are GUID and never change content; browsers can keep for year

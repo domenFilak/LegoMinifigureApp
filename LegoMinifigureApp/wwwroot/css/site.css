@@ -267,3 +267,59 @@ h1, .h1, h2, .h2 {
 .card-accent-yellow {
     border-top: 0.3rem solid var(--brick-yellow);
 }
+
+/*error pages; big brick with status code*/
+.error-page {
+    max-width: 36rem;
+    margin: 2rem auto;
+    text-align: center;
+}
+
+.error-brick {
+    --error-brick-color: var(--brick-red-fill);
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 12rem;
+    height: 6rem;
+    margin: 1.5rem 0 2rem; /*room for studs above*/
+    font-family: var(--brick-heading-font);
+    font-size: 3rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    background-color: var(--error-brick-color);
+    border-radius: 0.5rem;
+    box-shadow: inset 0 -0.5rem 0 rgba(0, 0, 0, 0.2); /*darker bottom edge*/
+}
+
+    /*4 studs on top*/
+    .error-brick::before {
+        content: "";
+        position: absolute;
+        top: -0.9rem;
+        left: 0;
+        right: 0;
+        height: 0.9rem;
+        background-image: radial-gradient(circle at 50% 100%, var(--error-brick-color) 0 0.85rem, transparent 0.87rem);
+        background-size: 3rem 0.9rem;
+        background-repeat: repeat-x;
+    }
+
+.error-brick-red {
+    --error-brick-color: var(--brick-red-fill);
+}
+
+.error-brick-yellow {
+    --error-brick-color: var(--brick-yellow);
+    color: var(--brick-ink-fill); /*dark text on yellow*/
+}
+
+.error-brick-blue {
+    --error-brick-color: var(--brick-blue-fill);
+}
+
+/*500; a brick that fell over*/
+.error-brick-tilted {
+    transform: rotate(-6deg);
+}
