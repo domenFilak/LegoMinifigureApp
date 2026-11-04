@@ -10,6 +10,7 @@ using LegoMinifigureApp.Services.Themes;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -108,7 +109,19 @@ if (!app.Environment.IsDevelopment())
 app.UseSecurityHeaders();
 app.UseHttpsRedirection();
 app.UseRequestLocalization("en-US");
-app.UseStaticFiles();
+//file names are GUID and never change content; browsers can keep for year
+var uploadsPath = Path.Combine(app.Environment.WebRootPath, LocalImageStorageService.UploadsFolder);
+Directory.CreateDirectory(uploadsPath);
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(uploadsPath),
+    RequestPath = "/" + LocalImageStorageService.UploadsFolder,
+    OnPrepareResponse = context =>
+    {
+        context.Context.Response.Headers.CacheControl = "public, max-age=31536000, immutable";
+    }
+});
 app.UseRouting();
 app.UseRateLimiter();
 

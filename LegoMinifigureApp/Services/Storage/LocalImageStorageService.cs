@@ -16,7 +16,7 @@ namespace LegoMinifigureApp.Services.Storage
         private const int Quality = 90;
         private const int ThumbnailMaxDimension = 600; //longest side of thumbnail in pixels
         private const int ThumbnailQuality = 80;
-        private const string UploadsFolder = "uploads";
+        public const string UploadsFolder = "uploads";
 
         private static readonly string[] AllowedExtensions = [".jpg", ".jpeg", ".png", ".webp"];
 
