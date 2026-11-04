@@ -7,5 +7,6 @@ namespace LegoMinifigureApp.Services.Storage
         Task<Error?> ValidateAsync(ImageUpload upload, CancellationToken cancellationToken = default);
         Task<string> SaveAsync(ImageUpload upload, string folder, CancellationToken cancellationToken = default);
         void Delete(string? relativePath);
+        Task CreateMissingThumbnailsAsync(CancellationToken cancellationToken = default);
     }
 }

@@ -92,6 +92,9 @@ using (var scope = app.Services.CreateScope())
 {
     var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
     await seeder.SeedAsync();
+
+    var imageStorage = scope.ServiceProvider.GetRequiredService<IImageStorageService>();
+    await imageStorage.CreateMissingThumbnailsAsync();
 }
 
 // Configure the HTTP request pipeline.

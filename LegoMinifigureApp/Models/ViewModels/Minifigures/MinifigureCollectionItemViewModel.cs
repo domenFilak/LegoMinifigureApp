@@ -24,7 +24,7 @@ namespace LegoMinifigureApp.Models.ViewModels.Minifigures
                 BrickLinkId = dto.BrickLinkId,
                 ThemeName = dto.ThemeName,
                 Condition = dto.Condition.ToString(),
-                ImageUrl = ImageUrls.ForMinifigure(dto.ImagePath),
+                ImageUrl = ImageUrls.ForMinifigureThumbnail(dto.ImagePath),
                 IsForSale = dto.IsForSale,
                 AskingPriceText = PriceText.Format(dto.AskingPrice),
                 IsForTrade = dto.IsForTrade

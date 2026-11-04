@@ -14,6 +14,8 @@ namespace LegoMinifigureApp.Services.Storage
         public const long MaxPixels = 40000000;
         private const int MaxDimension = 2000; //longest side of stored image in pixels
         private const int Quality = 90;
+        private const int ThumbnailMaxDimension = 600; //longest side of thumbnail in pixels
+        private const int ThumbnailQuality = 80;
         private const string UploadsFolder = "uploads";
 
         private static readonly string[] AllowedExtensions = [".jpg", ".jpeg", ".png", ".webp"];
@@ -31,27 +33,8 @@ namespace LegoMinifigureApp.Services.Storage
                 return;
             }
 
-            var uploadsRoot = Path.GetFullPath(Path.Combine(environment.WebRootPath, UploadsFolder));
-            var fullPath = Path.GetFullPath(Path.Combine(environment.WebRootPath, relativePath));
-
-            //only delete files inside wwwroot/uploads
-            if (!fullPath.StartsWith(uploadsRoot + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
-            {
-                logger.LogWarning("Refused to delete {Path}: it is outside the uploads folder.", fullPath);
-                return;
-            }
-
-            try
-            {
-                if (File.Exists(fullPath))
-                {
-                    File.Delete(fullPath);
-                }
-            }
-            catch (IOException ex)
-            {
-                logger.LogWarning(ex, "Could not delete image {Path}.", fullPath);
-            }
+            DeleteFile(relativePath); //call once to delete main image
+            DeleteFile(ImagePaths.ThumbnailFor(relativePath)); //call second time to delete thumbnail image as well
         }
 
         public async Task<string> SaveAsync(ImageUpload upload, string folder, CancellationToken cancellationToken = default)
@@ -76,21 +59,35 @@ namespace LegoMinifigureApp.Services.Storage
             }
 
             //remove metadata from image
-            image.Metadata.ExifProfile = null;   //camera, date, GPS location
-            image.Metadata.XmpProfile = null;    //editing software data, maybe sometimes location
-            image.Metadata.IptcProfile = null;   //captions, author, copyright, location
+            image.Metadata.ExifProfile = null; //camera, date, GPS location
+            image.Metadata.XmpProfile = null; //editing software data, maybe sometimes location
+            image.Metadata.IptcProfile = null; //captions, author, copyright, location
 
             var fileName = $"{Guid.NewGuid():N}{extension}";
             var directory = Path.Combine(environment.WebRootPath, UploadsFolder, folder);
             Directory.CreateDirectory(directory);
 
+            var relativePath = $"{UploadsFolder}/{folder}/{fileName}";
             var fullPath = Path.Combine(directory, fileName);
+
+            //main image
             await using (var fileStream = new FileStream(fullPath, FileMode.CreateNew))
             {
                 await image.SaveAsync(fileStream, CreateEncoder(extension), cancellationToken);
             }
 
-            return $"{UploadsFolder}/{folder}/{fileName}";
+            //small copy of main image for grids and lists
+            try
+            {
+                await SaveThumbnailAsync(image, relativePath, cancellationToken);
+            }
+            catch
+            {
+                Delete(relativePath); //never leave main image without its thumbnail
+                throw;
+            }
+
+            return relativePath;
         }
 
         public async Task<Error?> ValidateAsync(ImageUpload upload, CancellationToken cancellationToken = default)
@@ -140,6 +137,58 @@ namespace LegoMinifigureApp.Services.Storage
             return null;
         }
 
+        //creates thumbnails for images that do not have one yet
+        public async Task CreateMissingThumbnailsAsync(CancellationToken cancellationToken = default)
+        {
+            var uploadsRoot = Path.Combine(environment.WebRootPath, UploadsFolder);
+            if (!Directory.Exists(uploadsRoot))
+            {
+                return;
+            }
+
+            var createdCount = 0;
+
+            //each folder directly inside uploads (uploads/minifigures)
+            foreach (var directory in Directory.GetDirectories(uploadsRoot))
+            {
+                var folderName = Path.GetFileName(directory);
+
+                //only files directly in that folder (thumbnails folder itself is skipped)
+                foreach (var filePath in Directory.GetFiles(directory))
+                {
+                    var extension = Path.GetExtension(filePath).ToLowerInvariant();
+                    if (!AllowedExtensions.Contains(extension))
+                    {
+                        continue;
+                    }
+
+                    var imagePath = $"{UploadsFolder}/{folderName}/{Path.GetFileName(filePath)}";
+                    var thumbnailFullPath = Path.Combine(environment.WebRootPath, ImagePaths.ThumbnailFor(imagePath));
+
+                    if (File.Exists(thumbnailFullPath))
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        using var image = await Image.LoadAsync(filePath, cancellationToken);
+                        await SaveThumbnailAsync(image, imagePath, cancellationToken);
+                        createdCount++;
+                    }
+                    catch (Exception ex) when (ex is ImageFormatException or IOException)
+                    {
+                        logger.LogWarning(ex, "Could not create thumbnail for {Path}.", filePath);
+                    }
+                }
+            }
+
+            if (createdCount > 0)
+            {
+                logger.LogInformation("Created {Count} missing thumbnails.", createdCount);
+            }
+        }
+
         //picks encoder matching the detected format; turns pixels back into a file of one format
         private static ImageEncoder CreateEncoder(string extension)
         {
@@ -176,6 +225,55 @@ namespace LegoMinifigureApp.Services.Storage
             }
 
             return null;
+        }
+
+        //makes small copy of main image used in grids and lists; always WebP
+        private async Task SaveThumbnailAsync(Image image, string imagePath, CancellationToken cancellationToken)
+        {
+            //copy of image, original stays untouched
+            using var thumbnail = image.Clone(x => { });
+
+            //shrink only if bigger than thumbnail size, small images are never enlarged
+            if (thumbnail.Width > ThumbnailMaxDimension || thumbnail.Height > ThumbnailMaxDimension)
+            {
+                thumbnail.Mutate(x => x.Resize(new ResizeOptions
+                {
+                    Mode = ResizeMode.Max,
+                    Size = new Size(ThumbnailMaxDimension, ThumbnailMaxDimension)
+                }));
+            }
+
+            var thumbnailPath = ImagePaths.ThumbnailFor(imagePath);
+            var thumbnailFullPath = Path.Combine(environment.WebRootPath, thumbnailPath);
+            Directory.CreateDirectory(Path.GetDirectoryName(thumbnailFullPath)!);
+
+            await using var fileStream = new FileStream(thumbnailFullPath, FileMode.Create);
+            await thumbnail.SaveAsync(fileStream, new WebpEncoder { Quality = ThumbnailQuality, SkipMetadata = true }, cancellationToken);
+        }
+
+        private void DeleteFile(string relativePath)
+        {
+            var uploadsRoot = Path.GetFullPath(Path.Combine(environment.WebRootPath, UploadsFolder));
+            var fullPath = Path.GetFullPath(Path.Combine(environment.WebRootPath, relativePath));
+
+            //only delete files inside wwwroot/uploads
+            if (!fullPath.StartsWith(uploadsRoot + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+            {
+                logger.LogWarning("Refused to delete {Path}: it is outside the uploads folder.", fullPath);
+                return;
+            }
+
+            try
+            {
+                if (File.Exists(fullPath))
+                {
+                    File.Delete(fullPath);
+                }
+            }
+            catch (IOException ex)
+            {
+                logger.LogWarning(ex, "Could not delete image {Path}.", fullPath);
+            }
         }
     }
 }

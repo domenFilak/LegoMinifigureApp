@@ -13,7 +13,7 @@ namespace LegoMinifigureApp.Areas.Admin.ViewModels.Dashboard
         {
             Id = dto.Id,
             Name = dto.Name,
-            ImageUrl = ImageUrls.ForMinifigure(dto.ImagePath)
+            ImageUrl = ImageUrls.ForMinifigureThumbnail(dto.ImagePath)
         };
     }
 }
