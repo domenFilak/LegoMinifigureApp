@@ -11,6 +11,12 @@
         //404 and other error status codes
         public static ErrorPageViewModel ForStatusCode(int statusCode)
         {
+            //only real error codes; anything else treated as "not found"
+            if (statusCode < 400 || statusCode > 599)
+            {
+                statusCode = 404;
+            }
+
             if (statusCode == 404)
             {
                 return new ErrorPageViewModel
@@ -31,7 +37,7 @@
             {
                 StatusCode = statusCode,
                 Title = "This piece doesn't fit",
-                Message = "Your request couldn't be handled. Head back to the collection and try again.",
+                Message = "Your request couldn't be handled. Please go back and try again.",
                 BrickClass = "error-brick-blue"
             };
         }

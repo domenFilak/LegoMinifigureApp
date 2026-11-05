@@ -102,7 +102,13 @@ using (var scope = app.Services.CreateScope())
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+
+    //errors inside admin area show admin error page instead
+    app.UseWhen(
+        context => context.Request.Path.StartsWithSegments("/Admin"),
+        adminApp => adminApp.UseExceptionHandler("/Admin/Errors/Error"));
+
+    //default HSTS value is 30 days
     app.UseHsts();
 }
 
@@ -110,6 +116,11 @@ app.UseSecurityHeaders();
 
 //404 and other error codes without content show our own error page
 app.UseStatusCodePagesWithReExecute("/Home/Status/{0}");
+
+//inside admin area, the admin error page is shown instead
+app.UseWhen(
+    context => context.Request.Path.StartsWithSegments("/Admin"),
+    adminApp => adminApp.UseStatusCodePagesWithReExecute("/Admin/Errors/Status/{0}"));
 
 app.UseHttpsRedirection();
 app.UseRequestLocalization("en-US");

@@ -33,12 +33,9 @@ namespace LegoMinifigureApp.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Status(int id)
         {
-            //only real error codes; anything else typed into url treated as "not found"
-            var statusCode = id >= 400 && id <= 599 ? id : StatusCodes.Status404NotFound;
+            var model = ErrorPageViewModel.ForStatusCode(id);
 
-            Response.StatusCode = statusCode;
-
-            var model = ErrorPageViewModel.ForStatusCode(statusCode);
+            Response.StatusCode = model.StatusCode;
 
             return View("ErrorPage", model);
         }
