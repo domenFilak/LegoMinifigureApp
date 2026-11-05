@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- two studs on top -->
+  <rect x="5" y="5" width="8" height="6" rx="1.5" fill="#F2CD37" stroke="#1B2A34" stroke-width="1.5"/>
+  <rect x="19" y="5" width="8" height="6" rx="1.5" fill="#F2CD37" stroke="#1B2A34" stroke-width="1.5"/>
+  <!-- brick body -->
+  <rect x="1.75" y="9.75" width="28.5" height="19.5" rx="3" fill="#F2CD37" stroke="#1B2A34" stroke-width="1.5"/>
+  <!-- darker bottom edge, like the buttons -->
+  <rect x="2.5" y="24" width="27" height="4.5" rx="2.25" fill="#C9A51F"/>
+</svg>

@@ -1,4 +1,3 @@
-using LegoMinifigureApp.Models;
 using LegoMinifigureApp.Models.ViewModels.Errors;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
