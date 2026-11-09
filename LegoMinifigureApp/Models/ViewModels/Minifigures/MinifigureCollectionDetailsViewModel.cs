@@ -5,6 +5,7 @@ namespace LegoMinifigureApp.Models.ViewModels.Minifigures
 {
     public class MinifigureCollectionDetailsViewModel
     {
+        public int Id { get; init; }
         public string Name { get; init; } = string.Empty;
         public string BrickLinkId { get; init; } = string.Empty;
         public string ThemeName { get; init; } = string.Empty;
@@ -21,6 +22,7 @@ namespace LegoMinifigureApp.Models.ViewModels.Minifigures
         {
             return new MinifigureCollectionDetailsViewModel
             {
+                Id = dto.Id,
                 Name = dto.Name,
                 BrickLinkId = dto.BrickLinkId,
                 ThemeName = dto.ThemeName,
