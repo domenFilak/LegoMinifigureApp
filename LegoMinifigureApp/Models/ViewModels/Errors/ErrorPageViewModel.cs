@@ -28,6 +28,17 @@
                 };
             }
 
+            if (statusCode == 429)
+            {
+                return new ErrorPageViewModel
+                {
+                    StatusCode = statusCode,
+                    Title = "Slow down a bit",
+                    Message = "Too many requests in a short time. Please wait a few minutes and try again.",
+                    BrickClass = "error-brick-blue"
+                };
+            }
+
             if (statusCode >= 500)
             {
                 return ForServerError(referenceId: null, statusCode);

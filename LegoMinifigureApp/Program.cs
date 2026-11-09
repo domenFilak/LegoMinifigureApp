@@ -5,6 +5,7 @@ using LegoMinifigureApp.Entities;
 using LegoMinifigureApp.Security;
 using LegoMinifigureApp.Services.Dashboard;
 using LegoMinifigureApp.Services.Minifigures;
+using LegoMinifigureApp.Services.Offers;
 using LegoMinifigureApp.Services.Storage;
 using LegoMinifigureApp.Services.Themes;
 using Microsoft.AspNetCore.Identity;
@@ -57,13 +58,8 @@ builder.Services.Configure<CookieTempDataProviderOptions>(options =>
 
 builder.Services.AddRateLimiter(options =>
 {
+    //no body written here; the styled error page shows the 429
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-
-    options.OnRejected = async (context, cancellationToken) =>
-    {
-        context.HttpContext.Response.ContentType = "text/plain";
-        await context.HttpContext.Response.WriteAsync("Too many login attempts. Please wait a minute and try again.", cancellationToken);
-    };
 
     //max 10 login attempts per minute from one IP address
     options.AddPolicy(RateLimitPolicies.Login, httpContext =>
@@ -74,7 +70,22 @@ builder.Services.AddRateLimiter(options =>
                 PermitLimit = 10,
                 Window = TimeSpan.FromMinutes(1),
                 QueueLimit = 0
-            }));
+            }
+        )
+    );
+
+    //max 5 sent offers per 15 minutes from one IP address
+    options.AddPolicy(RateLimitPolicies.Offers, httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(15),
+                QueueLimit = 0
+            }
+        )
+    );
 });
 
 builder.Services.Configure<AdminAccountOptions>(builder.Configuration.GetSection(AdminAccountOptions.SectionName));
@@ -85,6 +96,7 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IThemeService, ThemeService>();
 builder.Services.AddScoped<IMinifigureService, MinifigureService>();
 builder.Services.AddScoped<IImageStorageService, LocalImageStorageService>();
+builder.Services.AddScoped<IOfferService, OfferService>();
 
 var app = builder.Build();
 

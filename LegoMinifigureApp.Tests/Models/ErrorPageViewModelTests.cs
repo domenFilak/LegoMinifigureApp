@@ -66,5 +66,15 @@ namespace LegoMinifigureApp.Tests.Models
             Assert.Equal("abc-123", model.ReferenceId);
             Assert.Contains("error-brick-tilted", model.BrickClass);
         }
+
+        [Fact]
+        public void ForStatusCode_429_HasItsOwnText()
+        {
+            var tooMany = ErrorPageViewModel.ForStatusCode(429);
+            var general = ErrorPageViewModel.ForStatusCode(400);
+
+            Assert.Equal(429, tooMany.StatusCode);
+            Assert.NotEqual(general.Title, tooMany.Title);
+        }
     }
 }
