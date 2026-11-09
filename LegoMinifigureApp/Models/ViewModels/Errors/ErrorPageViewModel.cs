@@ -30,7 +30,7 @@
 
             if (statusCode >= 500)
             {
-                return ForServerError(referenceId: null);
+                return ForServerError(referenceId: null, statusCode);
             }
 
             return new ErrorPageViewModel
@@ -42,12 +42,12 @@
             };
         }
 
-        //crash in code 500
-        public static ErrorPageViewModel ForServerError(string? referenceId)
+        //crash in code 500, or other server error codes
+        public static ErrorPageViewModel ForServerError(string? referenceId, int statusCode = 500)
         {
             return new ErrorPageViewModel
             {
-                StatusCode = 500,
+                StatusCode = statusCode,
                 Title = "Oops, the build collapsed",
                 Message = "Something went wrong on our side. Please try again in a moment.",
                 BrickClass = "error-brick-red error-brick-tilted",

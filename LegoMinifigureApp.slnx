@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="LegoMinifigureApp.Tests/LegoMinifigureApp.Tests.csproj" Id="a55e8efc-ec51-4c78-be0e-f6f06161206b" />
   <Project Path="LegoMinifigureApp/LegoMinifigureApp.csproj" />
 </Solution>

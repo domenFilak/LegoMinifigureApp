@@ -6,7 +6,6 @@ using LegoMinifigureApp.Services.Common;
 using LegoMinifigureApp.Services.Minifigures.Dtos;
 using LegoMinifigureApp.Services.Storage;
 using Microsoft.EntityFrameworkCore;
-using System.Text;
 
 namespace LegoMinifigureApp.Services.Minifigures
 {
@@ -18,8 +17,6 @@ namespace LegoMinifigureApp.Services.Minifigures
         public const int PageSize = 20; //used by archive
         private const int MaxPageSize = 100;
         private const string ImageFolder = "minifigures";
-        private const int MinSearchWordLength = 2;
-        private const int MaxSearchWords = 5;
 
         public async Task<PagedResult<MinifigureListItemDto>> GetOwnedPageAsync(MinifigureListQuery query, CancellationToken cancellationToken = default)
         {
@@ -30,7 +27,7 @@ namespace LegoMinifigureApp.Services.Minifigures
             var isSearching = false;
             if (!string.IsNullOrWhiteSpace(query.Search))
             {
-                var searchCondition = BuildFullTextSearchCondition(query.Search);
+                var searchCondition = FullTextSearchCondition.Build(query.Search);
                 if (searchCondition is not null)
                 {
                     figures = figures.Where(m =>
@@ -115,7 +112,7 @@ namespace LegoMinifigureApp.Services.Minifigures
             var isSearching = false;
             if (!string.IsNullOrWhiteSpace(query.Search))
             {
-                var searchCondition = BuildFullTextSearchCondition(query.Search);
+                var searchCondition = FullTextSearchCondition.Build(query.Search);
                 if (searchCondition is not null)
                 {
                     figures = figures.Where(m =>
@@ -728,49 +725,5 @@ namespace LegoMinifigureApp.Services.Minifigures
             return timeProvider.GetUtcNow().UtcDateTime;
         }
 
-        //only letters and digits left, other cleaned
-        //min 2 characters, max 5 words for search in search bar
-        private static string? BuildFullTextSearchCondition(string search)
-        {
-            var cleaned = new StringBuilder(search.Length);
-
-            foreach (var character in search)
-            {
-                if (char.IsLetterOrDigit(character))
-                {
-                    cleaned.Append(character);
-                }
-                else
-                {
-                    cleaned.Append(' ');
-                }
-            }
-
-            var words = cleaned.ToString().Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-            var terms = new List<string>();
-
-            foreach (var word in words)
-            {
-                if (word.Length < MinSearchWordLength)
-                {
-                    continue;
-                }
-
-                terms.Add($"\"{word}*\"");
-
-                if (terms.Count == MaxSearchWords)
-                {
-                    break;
-                }
-            }
-
-            if (terms.Count == 0)
-            {
-                return null;
-            }
-
-            return string.Join(" AND ", terms);
-        }
     }
 }
