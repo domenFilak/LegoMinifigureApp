@@ -8,6 +8,7 @@ namespace LegoMinifigureApp.Data
     {
         public DbSet<Minifigure> Minifigures => Set<Minifigure>();
         public DbSet<Theme> Themes => Set<Theme>();
+        public DbSet<Offer> Offers => Set<Offer>();
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

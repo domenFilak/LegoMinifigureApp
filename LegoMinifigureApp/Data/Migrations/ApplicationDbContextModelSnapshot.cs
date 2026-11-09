@@ -218,6 +218,93 @@ namespace LegoMinifigureApp.Data.Migrations
                         });
                 });
 
+            modelBuilder.Entity("LegoMinifigureApp.Entities.Offer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal?>("AskingPriceAtOffer")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("MinifigureId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal?>("OfferedPrice")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("StatusChangedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MinifigureId");
+
+                    b.HasIndex("Status", "CreatedAt", "Id")
+                        .IsDescending(false, true, true)
+                        .HasDatabaseName("IX_Offers_Status_CreatedAt")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("Offers", t =>
+                        {
+                            t.HasCheckConstraint("CK_Offers_AskingPriceAtOffer", "[AskingPriceAtOffer] IS NULL OR [AskingPriceAtOffer] > 0");
+
+                            t.HasCheckConstraint("CK_Offers_DeletedAt", "([IsDeleted] = 0 AND [DeletedAt] IS NULL) OR ([IsDeleted] = 1 AND [DeletedAt] IS NOT NULL)");
+
+                            t.HasCheckConstraint("CK_Offers_OfferedPrice", "([Type] = 'Buy' AND [OfferedPrice] > 0) OR ([Type] = 'Trade' AND [OfferedPrice] IS NULL)");
+
+                            t.HasCheckConstraint("CK_Offers_StatusChangedAt", "([Status] = 'New' AND [StatusChangedAt] IS NULL) OR ([Status] <> 'New' AND [StatusChangedAt] IS NOT NULL)");
+
+                            t.HasCheckConstraint("CK_Offers_TradeMessage", "[Type] <> 'Trade' OR ([Message] IS NOT NULL AND LEN([Message]) > 0)");
+                        });
+                });
+
             modelBuilder.Entity("LegoMinifigureApp.Entities.Theme", b =>
                 {
                     b.Property<int>("Id")
@@ -397,6 +484,17 @@ namespace LegoMinifigureApp.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Theme");
+                });
+
+            modelBuilder.Entity("LegoMinifigureApp.Entities.Offer", b =>
+                {
+                    b.HasOne("LegoMinifigureApp.Entities.Minifigure", "Minifigure")
+                        .WithMany()
+                        .HasForeignKey("MinifigureId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Minifigure");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
