@@ -1,0 +1,22 @@
+﻿@model OfferFigureViewModel
+
+<div class="card brick-card shadow-sm">
+	<img src="@Model.ImageUrl" alt="@Model.Name" class="figure-card-img" />
+	<div class="card-body">
+		<h2 class="h5 mb-1">@Model.Name</h2>
+		<p class="text-muted small mb-2">@Model.BrickLinkId</p>
+
+		@if (Model.AskingPriceText is not null)
+		{
+			<div class="mb-1">
+				<span class="badge badge-brick badge-sale">For sale</span>
+				<span class="fw-semibold ms-1">@Model.AskingPriceText</span>
+			</div>
+		}
+
+		@if (Model.TradeNotes is not null)
+		{
+			<p class="small mt-2 mb-0 text-preserve-lines">@Model.TradeNotes</p>
+		}
+	</div>
+</div>

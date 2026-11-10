@@ -1,0 +1,73 @@
+﻿@model BuyOfferFormViewModel
+
+@{
+	ViewData["Title"] = $"Buy {Model.Figure.Name}";
+}
+
+<a asp-controller="Minifigures" asp-action="Details" asp-route-id="@Model.Figure.Id" class="btn btn-outline-secondary mb-3">Back to figure</a>
+
+<div class="row g-4">
+	<div class="col-md-5 col-lg-4">
+		<partial name="_OfferFigureCard" model="Model.Figure" />
+	</div>
+
+	<div class="col-md-7 col-lg-8">
+		<h1 class="mb-1">Make an offer to buy</h1>
+		<p class="text-muted mb-4">Tell me how much you'd like to pay, and I'll reply by e-mail.</p>
+
+		@if (Model.ListingWasUpdated)
+		{
+			<div class="alert alert-warning" role="alert">
+				This listing was just updated. Please check the details and send your offer again.
+			</div>
+		}
+
+		<form asp-action="Buy" asp-route-id="@Model.Figure.Id" method="post">
+			<input type="hidden" asp-for="FigureRowVersion" />
+			<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+			<div class="mb-3">
+				<label asp-for="Name" class="form-label"></label>
+				<input asp-for="Name" class="form-control" autocomplete="name" maxlength="@LegoMinifigureApp.Entities.Offer.NameMaxLength" />
+				<span asp-validation-for="Name" class="text-danger"></span>
+			</div>
+
+			<div class="mb-3">
+				<label asp-for="Email" class="form-label"></label>
+				<input asp-for="Email" type="email" class="form-control" autocomplete="email" maxlength="@LegoMinifigureApp.Entities.Offer.EmailMaxLength" />
+				<span asp-validation-for="Email" class="text-danger"></span>
+			</div>
+
+			<div class="mb-3">
+				<label asp-for="OfferedPrice" class="form-label"></label>
+				<input asp-for="OfferedPrice" type="number" step="0.01" min="0.01" max="@LegoMinifigureApp.Entities.Offer.MaxOfferedPrice" class="form-control" />
+				<span asp-validation-for="OfferedPrice" class="text-danger"></span>
+			</div>
+
+			<div class="mb-3">
+				<label asp-for="Message" class="form-label"></label>
+				<textarea asp-for="Message" class="form-control" rows="3"
+						  maxlength="@LegoMinifigureApp.Entities.Offer.MessageMaxLength"
+						  placeholder="Optional – e.g. when you could pick it up"></textarea>
+				<span asp-validation-for="Message" class="text-danger"></span>
+			</div>
+
+			<div class="form-honeypot" aria-hidden="true">
+				<label asp-for="Website">Website</label>
+				<input asp-for="Website" tabindex="-1" autocomplete="off" />
+			</div>
+
+			<p class="small text-muted">
+				Your name and e-mail are only used to reply to this offer.
+				<a asp-controller="Home" asp-action="Privacy">Privacy</a>
+			</p>
+
+			<button type="submit" class="btn btn-primary">Send offer</button>
+			<a asp-controller="Minifigures" asp-action="Details" asp-route-id="@Model.Figure.Id" class="btn btn-outline-secondary">Cancel</a>
+		</form>
+	</div>
+</div>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+}

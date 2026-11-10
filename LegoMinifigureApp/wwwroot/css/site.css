@@ -323,3 +323,12 @@ h1, .h1, h2, .h2 {
 .error-brick-tilted {
     transform: rotate(-6deg);
 }
+
+/*offer forms; spam trap field moved off screen, people never see it*/
+.form-honeypot {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}

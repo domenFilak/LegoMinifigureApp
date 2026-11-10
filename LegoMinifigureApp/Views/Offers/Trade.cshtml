@@ -1,0 +1,67 @@
+﻿@model TradeOfferFormViewModel
+
+@{
+	ViewData["Title"] = $"Trade for {Model.Figure.Name}";
+}
+
+<a asp-controller="Minifigures" asp-action="Details" asp-route-id="@Model.Figure.Id" class="btn btn-outline-secondary mb-3">Back to figure</a>
+
+<div class="row g-4">
+	<div class="col-md-5 col-lg-4">
+		<partial name="_OfferFigureCard" model="Model.Figure" />
+	</div>
+
+	<div class="col-md-7 col-lg-8">
+		<h1 class="mb-1">Propose a trade</h1>
+		<p class="text-muted mb-4">Tell me what you'd offer in exchange, and I'll reply by e-mail.</p>
+
+		@if (Model.ListingWasUpdated)
+		{
+			<div class="alert alert-warning" role="alert">
+				This listing was just updated. Please check the details and send your offer again.
+			</div>
+		}
+
+		<form asp-action="Trade" asp-route-id="@Model.Figure.Id" method="post">
+			<input type="hidden" asp-for="FigureRowVersion" />
+			<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+			<div class="mb-3">
+				<label asp-for="Name" class="form-label"></label>
+				<input asp-for="Name" class="form-control" autocomplete="name" maxlength="@LegoMinifigureApp.Entities.Offer.NameMaxLength" />
+				<span asp-validation-for="Name" class="text-danger"></span>
+			</div>
+
+			<div class="mb-3">
+				<label asp-for="Email" class="form-label"></label>
+				<input asp-for="Email" type="email" class="form-control" autocomplete="email" maxlength="@LegoMinifigureApp.Entities.Offer.EmailMaxLength" />
+				<span asp-validation-for="Email" class="text-danger"></span>
+			</div>
+
+			<div class="mb-3">
+				<label asp-for="Message" class="form-label"></label>
+				<textarea asp-for="Message" class="form-control" rows="4"
+						  maxlength="@LegoMinifigureApp.Entities.Offer.MessageMaxLength"
+						  placeholder="e.g. my Boba Fett (sw0002, used) for your figure"></textarea>
+				<span asp-validation-for="Message" class="text-danger"></span>
+			</div>
+
+			<div class="form-honeypot" aria-hidden="true">
+				<label asp-for="Website">Website</label>
+				<input asp-for="Website" tabindex="-1" autocomplete="off" />
+			</div>
+
+			<p class="small text-muted">
+				Your name and e-mail are only used to reply to this offer.
+				<a asp-controller="Home" asp-action="Privacy">Privacy</a>
+			</p>
+
+			<button type="submit" class="btn btn-primary">Send offer</button>
+			<a asp-controller="Minifigures" asp-action="Details" asp-route-id="@Model.Figure.Id" class="btn btn-outline-secondary">Cancel</a>
+		</form>
+	</div>
+</div>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+}

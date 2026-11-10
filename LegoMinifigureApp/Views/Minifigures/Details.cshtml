@@ -36,6 +36,16 @@
 					</div>
 				}
 			</div>
+			<div class="d-flex flex-wrap gap-2 mb-3">
+				@if (Model.IsForSale)
+				{
+					<a asp-controller="Offers" asp-action="Buy" asp-route-id="@Model.Id" class="btn btn-primary">Buy</a>
+				}
+				@if (Model.IsForTrade)
+				{
+					<a asp-controller="Offers" asp-action="Trade" asp-route-id="@Model.Id" class="btn btn-outline-primary">Trade</a>
+				}
+			</div>
 		}
 
 		<dl class="row">
