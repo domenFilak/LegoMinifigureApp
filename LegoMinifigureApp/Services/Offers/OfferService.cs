@@ -20,7 +20,9 @@ namespace LegoMinifigureApp.Services.Offers
                     m.Name,
                     m.BrickLinkId,
                     m.ImagePath,
+                    m.IsForSale,
                     m.AskingPrice,
+                    m.IsForTrade,
                     m.TradeNotes,
                     m.RowVersion)
                 )
@@ -37,7 +39,9 @@ namespace LegoMinifigureApp.Services.Offers
                     m.Name,
                     m.BrickLinkId,
                     m.ImagePath,
+                    m.IsForSale,
                     m.AskingPrice,
+                    m.IsForTrade,
                     m.TradeNotes,
                     m.RowVersion)
                 )

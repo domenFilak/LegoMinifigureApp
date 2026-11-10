@@ -10,7 +10,9 @@ namespace LegoMinifigureApp.Models.ViewModels.Offers
         public string Name { get; init; } = string.Empty;
         public string BrickLinkId { get; init; } = string.Empty;
         public string ImageUrl { get; init; } = string.Empty;
+        public bool IsForSale { get; init; }
         public string? AskingPriceText { get; init; }
+        public bool IsForTrade { get; init; }
         public string? TradeNotes { get; init; }
 
         public static OfferFigureViewModel From(OfferFigureDto dto)
@@ -21,7 +23,9 @@ namespace LegoMinifigureApp.Models.ViewModels.Offers
                 Name = dto.Name,
                 BrickLinkId = dto.BrickLinkId,
                 ImageUrl = ImageUrls.ForMinifigureThumbnail(dto.ImagePath),
+                IsForSale = dto.IsForSale,
                 AskingPriceText = PriceText.Format(dto.AskingPrice),
+                IsForTrade = dto.IsForTrade,
                 TradeNotes = dto.TradeNotes
             };
         }

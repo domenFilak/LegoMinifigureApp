@@ -7,7 +7,9 @@
         string Name,
         string BrickLinkId,
         string? ImagePath,
+        bool IsForSale,
         decimal? AskingPrice,
+        bool IsForTrade,
         string? TradeNotes,
         byte[] RowVersion
     );
