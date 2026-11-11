@@ -119,5 +119,57 @@ namespace LegoMinifigureApp.Tests.Entities
             Assert.Throws<ArgumentOutOfRangeException>(() =>
                 Offer.CreateTrade(7, "Ana", "ana@example.com", "My Boba Fett", (decimal)snapshot, Now));
         }
+
+        //handling by admin
+        [Fact]
+        public void Accept_NewOffer_SetsStatusAndDate()
+        {
+            var offer = Offer.CreateBuy(7, "Ana", "ana@example.com", 20m, null, 25m, Now);
+            var acceptedAt = Now.AddDays(1);
+
+            offer.Accept(acceptedAt);
+
+            Assert.Equal(OfferStatus.Accepted, offer.Status);
+            Assert.Equal(acceptedAt, offer.StatusChangedAt);
+        }
+
+        [Fact]
+        public void Decline_NewOffer_SetsStatusAndDate()
+        {
+            var offer = Offer.CreateTrade(7, "Ana", "ana@example.com", "My Boba Fett", null, Now);
+            var declinedAt = Now.AddDays(1);
+
+            offer.Decline(declinedAt);
+
+            Assert.Equal(OfferStatus.Declined, offer.Status);
+            Assert.Equal(declinedAt, offer.StatusChangedAt);
+        }
+
+        [Fact]
+        public void Accept_AlreadyAccepted_Throws()
+        {
+            var offer = Offer.CreateBuy(7, "Ana", "ana@example.com", 20m, null, 25m, Now);
+            offer.Accept(Now);
+
+            Assert.Throws<InvalidOperationException>(() => offer.Accept(Now));
+        }
+
+        [Fact]
+        public void Decline_AlreadyAccepted_Throws()
+        {
+            var offer = Offer.CreateBuy(7, "Ana", "ana@example.com", 20m, null, 25m, Now);
+            offer.Accept(Now);
+
+            Assert.Throws<InvalidOperationException>(() => offer.Decline(Now));
+        }
+
+        [Fact]
+        public void Accept_AlreadyDeclined_Throws()
+        {
+            var offer = Offer.CreateBuy(7, "Ana", "ana@example.com", 20m, null, 25m, Now);
+            offer.Decline(Now);
+
+            Assert.Throws<InvalidOperationException>(() => offer.Accept(Now));
+        }
     }
 }

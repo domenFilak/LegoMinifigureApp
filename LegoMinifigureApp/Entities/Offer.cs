@@ -95,6 +95,33 @@ namespace LegoMinifigureApp.Entities
             return offer;
         }
 
+        //accepted the trade; from here on by email arranged
+        public void Accept(DateTime nowUtc)
+        {
+            EnsureNew();
+
+            Status = OfferStatus.Accepted;
+            StatusChangedAt = nowUtc;
+        }
+
+        //admin declined the trade
+        public void Decline(DateTime nowUtc)
+        {
+            EnsureNew();
+
+            Status = OfferStatus.Declined;
+            StatusChangedAt = nowUtc;
+        }
+
+        //offer handled only once; accepted or declined is final
+        private void EnsureNew()
+        {
+            if (Status != OfferStatus.New)
+            {
+                throw new InvalidOperationException($"Offer {Id} is already {Status}.");
+            }
+        }
+
         private static string RequireText(string? value, string parameterName)
         {
             if (string.IsNullOrWhiteSpace(value))

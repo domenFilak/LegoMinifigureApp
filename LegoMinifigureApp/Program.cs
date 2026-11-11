@@ -97,6 +97,8 @@ builder.Services.AddScoped<IThemeService, ThemeService>();
 builder.Services.AddScoped<IMinifigureService, MinifigureService>();
 builder.Services.AddScoped<IImageStorageService, LocalImageStorageService>();
 builder.Services.AddScoped<IOfferService, OfferService>();
+builder.Services.AddScoped<IOfferAdminService, OfferAdminService>();
+builder.Services.AddHostedService<OfferCleanupJob>();
 
 var app = builder.Build();
 

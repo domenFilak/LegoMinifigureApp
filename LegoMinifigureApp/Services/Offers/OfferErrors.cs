@@ -1,4 +1,5 @@
 ﻿using LegoMinifigureApp.Entities;
+using LegoMinifigureApp.Entities.Enums;
 using LegoMinifigureApp.Services.Common;
 
 namespace LegoMinifigureApp.Services.Offers
@@ -49,5 +50,15 @@ namespace LegoMinifigureApp.Services.Offers
 
         public static Error MessageTooLong =>
             Error.Validation($"Your message can be at most {Offer.MessageMaxLength} characters.", nameof(TradeOfferCommand.Message));
+
+        //admin side
+        public static Error OfferNotFound(int id) =>
+            Error.NotFound($"Offer {id} was not found.");
+
+        public static Error OfferConcurrencyConflict =>
+            Error.Conflict("This offer was changed in the meantime. Please check it and try again.");
+
+        public static Error AlreadyHandled(OfferStatus status) =>
+            Error.Conflict($"This offer is already {status.ToString().ToLowerInvariant()}.");
     }
 }
