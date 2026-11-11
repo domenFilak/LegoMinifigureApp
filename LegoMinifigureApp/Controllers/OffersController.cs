@@ -29,7 +29,7 @@ namespace LegoMinifigureApp.Controllers
         [ValidateAntiForgeryToken]
         [EnableRateLimiting(RateLimitPolicies.Offers)]
         [RequestSizeLimit(MaxFormSize)]
-        public async Task<IActionResult> Buy(int id, BuyOfferFormViewModel model, CancellationToken cancellationToken)
+        public async Task<IActionResult> Buy([FromRoute] int id, BuyOfferFormViewModel model, CancellationToken cancellationToken)
         {
             //spam trap filled in => a bot; act as if it worked but save nothing
             if (!string.IsNullOrEmpty(model.Website))
@@ -95,7 +95,7 @@ namespace LegoMinifigureApp.Controllers
         [ValidateAntiForgeryToken]
         [EnableRateLimiting(RateLimitPolicies.Offers)]
         [RequestSizeLimit(MaxFormSize)]
-        public async Task<IActionResult> Trade(int id, TradeOfferFormViewModel model, CancellationToken cancellationToken)
+        public async Task<IActionResult> Trade([FromRoute] int id, TradeOfferFormViewModel model, CancellationToken cancellationToken)
         {
             //spam trap filled in => a bot; act as if it worked, save nothing
             if (!string.IsNullOrEmpty(model.Website))

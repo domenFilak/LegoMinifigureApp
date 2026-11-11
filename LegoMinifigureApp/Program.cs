@@ -64,7 +64,7 @@ builder.Services.AddRateLimiter(options =>
     //max 10 login attempts per minute from one IP address
     options.AddPolicy(RateLimitPolicies.Login, httpContext =>
         RateLimitPartition.GetFixedWindowLimiter(
-            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            partitionKey: RateLimitKeys.ForClient(httpContext),
             factory: _ => new FixedWindowRateLimiterOptions
             {
                 PermitLimit = 10,
@@ -77,7 +77,7 @@ builder.Services.AddRateLimiter(options =>
     //max 5 sent offers per 15 minutes from one IP address
     options.AddPolicy(RateLimitPolicies.Offers, httpContext =>
         RateLimitPartition.GetFixedWindowLimiter(
-            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            partitionKey: RateLimitKeys.ForClient(httpContext),
             factory: _ => new FixedWindowRateLimiterOptions
             {
                 PermitLimit = 5,
