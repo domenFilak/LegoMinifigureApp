@@ -278,7 +278,7 @@ namespace LegoMinifigureApp.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> MarkAsSold(int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> MarkAsSold(int id, decimal? price, CancellationToken cancellationToken)
         {
             var figure = await _minifigureService.GetDetailsAsync(id, cancellationToken);
             if (figure is null)
@@ -292,7 +292,15 @@ namespace LegoMinifigureApp.Areas.Admin.Controllers
                 return RedirectToAction(nameof(Details), new { id });
             }
 
-            return View(MinifigureSoldFormViewModel.From(figure));
+            var model = MinifigureSoldFormViewModel.From(figure);
+
+            //coming from an accepted offer: prefill with the offered price instead of the asking price
+            if (price.HasValue && price.Value > 0)
+            {
+                model.SalePrice = price.Value;
+            }
+
+            return View(model);
         }
 
         [HttpPost]

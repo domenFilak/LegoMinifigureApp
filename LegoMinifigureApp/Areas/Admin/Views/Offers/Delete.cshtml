@@ -1,0 +1,38 @@
+﻿@model OfferDetailsViewModel
+
+@{
+	ViewData["Title"] = "Delete offer";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+<div class="row">
+	<div class="col-md-8 col-lg-6">
+		<div class="card shadow-sm border-danger">
+			<div class="card-body">
+				<div class="d-flex gap-3 mb-3">
+					<img src="@Model.MinifigureImageUrl" alt="@Model.MinifigureName" class="figure-thumb-md" />
+					<div>
+						<div class="fw-semibold">@Model.TypeText offer from @Model.Name</div>
+						<div class="small text-muted">@Model.MinifigureName · @Model.StatusText</div>
+					</div>
+				</div>
+
+				<p>
+					Delete this offer? It will disappear from your offers list. The data is removed
+					permanently by the automatic clean-up 6 months later.
+				</p>
+
+				<p class="small text-muted">
+					Deleting is meant for spam. To answer a real offer, use Accept or Decline instead.
+				</p>
+
+				<form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+					<input type="hidden" name="rowVersion" value="@Model.RowVersion" />
+					<button type="submit" class="btn btn-danger">Delete</button>
+					<a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

@@ -6,6 +6,26 @@
 
 <h1 class="mb-4">@ViewData["Title"]</h1>
 
+<!--offers from visitors waiting for an answer-->
+<div class="card card-accent-blue shadow-sm mb-4">
+	<div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-2">
+		<div>
+			<h2 class="h6 text-uppercase text-muted mb-1">Offers</h2>
+			@if (Model.NewOffersCount > 0)
+			{
+				<p class="mb-0">
+					<strong>@Model.NewOffersCount</strong> new @(Model.NewOffersCount == 1 ? "offer is" : "offers are") waiting for an answer.
+				</p>
+			}
+			else
+			{
+				<p class="mb-0 text-muted">No new offers.</p>
+			}
+		</div>
+		<a asp-area="Admin" asp-controller="Offers" asp-action="Index" class="btn btn-outline-primary">View offers</a>
+	</div>
+</div>
+
 <div class="row g-4 mb-4">
 
 	<!--short summary of the current collection-->

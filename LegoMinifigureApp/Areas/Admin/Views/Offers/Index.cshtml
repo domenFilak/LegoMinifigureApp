@@ -1,0 +1,137 @@
+﻿@model OfferIndexViewModel
+
+@{
+	ViewData["Title"] = "Offers";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+	<h1 class="mb-0">@ViewData["Title"]</h1>
+</div>
+
+<!-- filters, GET form; values into URL -->
+<form asp-action="Index" method="get" class="card card-body shadow-sm mb-4">
+	<div class="row g-2 align-items-end">
+		<div class="col-12 col-sm-6 col-lg-4">
+			<label asp-for="Status" class="form-label">Status</label>
+			<select asp-for="Status" asp-items="Model.StatusOptions" class="form-select"></select>
+		</div>
+		<div class="col-12 col-sm-6 col-lg-4">
+			<label asp-for="Type" class="form-label">Type</label>
+			<select asp-for="Type" asp-items="Model.TypeOptions" class="form-select"></select>
+		</div>
+		<div class="col-12 col-lg-4 d-flex gap-2">
+			<button type="submit" class="btn btn-outline-primary w-100">Filter</button>
+			@if (Model.HasActiveFilters)
+			{
+				<a asp-action="Index" class="btn btn-outline-secondary" title="Clear filters">✕</a>
+			}
+		</div>
+	</div>
+</form>
+
+@if (!Model.HasItems)
+{
+	<div class="card card-body shadow-sm text-center text-muted">
+		@if (Model.HasActiveFilters)
+		{
+			<p class="mb-2">No offers match your filters.</p>
+			<a asp-action="Index">Show new offers</a>
+		}
+		else
+		{
+			<p class="mb-0">No new offers. Nice – you're all caught up.</p>
+		}
+	</div>
+}
+else
+{
+	<div class="card shadow-sm">
+		<div class="table-responsive">
+			<table class="table table-hover align-middle mb-0">
+				<thead>
+					<tr>
+						<th class="d-none d-md-table-cell">Received</th>
+						<th class="col-thumb"></th>
+						<th>Figure</th>
+						<th>Type</th>
+						<th>Offer</th>
+						<th class="d-none d-lg-table-cell">From</th>
+						<th>Status</th>
+						<th class="text-end">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var offer in Model.Items)
+					{
+						<tr>
+							<td class="d-none d-md-table-cell">
+								<time datetime="@UtcDates.ToIso(offer.CreatedAt)" data-local-time>@UtcDates.ToFallbackText(offer.CreatedAt)</time>
+							</td>
+							<td><img src="@offer.MinifigureImageUrl" alt="@offer.MinifigureName" class="figure-thumb-sm" /></td>
+							<td>
+								<div class="fw-semibold">@offer.MinifigureName</div>
+								@if (offer.FigureNote is not null)
+								{
+									<span class="badge text-bg-secondary">@offer.FigureNote</span>
+								}
+							</td>
+							<td>
+								<span class="badge badge-brick @offer.TypeBadgeClass">@offer.TypeText</span>
+							</td>
+							<td>
+								@if (offer.OfferedPriceText is not null)
+								{
+									<div class="fw-semibold">@offer.OfferedPriceText</div>
+									@if (offer.AskingPriceAtOfferText is not null)
+									{
+										<div class="small text-muted">asking @offer.AskingPriceAtOfferText</div>
+									}
+								}
+								else if (offer.MessagePreview is not null)
+								{
+									<span class="small">@offer.MessagePreview</span>
+								}
+							</td>
+							<td class="d-none d-lg-table-cell">
+								<div>@offer.Name</div>
+								<div class="small text-muted">@offer.Email</div>
+							</td>
+							<td>
+								<span class="badge badge-brick @offer.StatusBadgeClass">@offer.StatusText</span>
+							</td>
+							<td class="text-end">
+								<a asp-action="Details" asp-route-id="@offer.Id" class="btn btn-sm btn-outline-secondary">Open</a>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<!-- Paging -->
+	<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-3">
+		<span class="text-muted small">
+			Showing @Model.FirstItemNumber–@Model.LastItemNumber of @Model.TotalCount
+		</span>
+
+		@if (Model.TotalPages > 1)
+		{
+			<nav aria-label="Offer pages">
+				<ul class="pagination mb-0">
+					<li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+						<a class="page-link" asp-action="Index"
+						   asp-all-route-data="Model.RouteValuesForPage(Model.Page - 1)">Previous</a>
+					</li>
+					<li class="page-item disabled">
+						<span class="page-link">Page @Model.Page of @Model.TotalPages</span>
+					</li>
+					<li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+						<a class="page-link" asp-action="Index"
+						   asp-all-route-data="Model.RouteValuesForPage(Model.Page + 1)">Next</a>
+					</li>
+				</ul>
+			</nav>
+		}
+	</div>
+}

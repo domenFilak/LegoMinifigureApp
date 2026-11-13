@@ -1,0 +1,117 @@
+﻿@model OfferDetailsViewModel
+
+@{
+	ViewData["Title"] = $"Offer from {Model.Name}";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+	<div>
+		<h1 class="mb-1">@ViewData["Title"]</h1>
+		<span class="badge badge-brick @Model.TypeBadgeClass">@Model.TypeText</span>
+		<span class="badge badge-brick @Model.StatusBadgeClass">@Model.StatusText</span>
+	</div>
+	<a asp-action="Index" class="btn btn-outline-secondary">Back to offers</a>
+</div>
+
+<div class="row g-4">
+	<!--the offer-->
+	<div class="col-lg-7">
+		<div class="card shadow-sm">
+			<div class="card-body">
+				<dl class="row mb-0">
+					<dt class="col-sm-4">Received</dt>
+					<dd class="col-sm-8">
+						<time datetime="@UtcDates.ToIso(Model.CreatedAt)" data-local-time>@UtcDates.ToFallbackText(Model.CreatedAt)</time>
+					</dd>
+
+					<dt class="col-sm-4">From</dt>
+					<dd class="col-sm-8">
+						<div>@Model.Name</div>
+						<a href="@Model.MailtoUrl">@Model.Email</a>
+					</dd>
+
+					@if (Model.OfferedPriceText is not null)
+					{
+						<dt class="col-sm-4">Offered price</dt>
+						<dd class="col-sm-8 fw-semibold">@Model.OfferedPriceText</dd>
+					}
+
+					<dt class="col-sm-4">Asking price then</dt>
+					<dd class="col-sm-8">@(Model.AskingPriceAtOfferText ?? "Not for sale")</dd>
+
+					<dt class="col-sm-4">Message</dt>
+					<dd class="col-sm-8 text-preserve-lines">@(Model.Message ?? "–")</dd>
+
+					@if (Model.StatusChangedAt.HasValue)
+					{
+						<dt class="col-sm-4">@Model.StatusText</dt>
+						<dd class="col-sm-8">
+							<time datetime="@UtcDates.ToIso(Model.StatusChangedAt.Value)" data-local-time>@UtcDates.ToFallbackText(Model.StatusChangedAt.Value)</time>
+						</dd>
+					}
+				</dl>
+			</div>
+		</div>
+	</div>
+
+	<!--figure and actions-->
+	<div class="col-lg-5">
+		<div class="card shadow-sm mb-4">
+			<div class="card-body d-flex gap-3">
+				<img src="@Model.MinifigureImageUrl" alt="@Model.MinifigureName" class="figure-thumb-md" />
+				<div>
+					@if (Model.FigureIsDeleted)
+					{
+						<div class="fw-semibold">@Model.MinifigureName</div>
+					}
+					else
+					{
+						<a asp-controller="Minifigures" asp-action="Details" asp-route-id="@Model.MinifigureId" class="fw-semibold">@Model.MinifigureName</a>
+					}
+					<div class="small text-muted">@Model.BrickLinkId</div>
+
+					@if (Model.FigureNote is not null)
+					{
+						<span class="badge text-bg-secondary mt-1">@Model.FigureNote</span>
+					}
+					else
+					{
+						<div class="small mt-1">Now: @(Model.CurrentListingText ?? "not listed")</div>
+					}
+				</div>
+			</div>
+		</div>
+
+		<div class="card shadow-sm">
+			<div class="card-body">
+				<h2 class="h6 text-uppercase text-muted">Actions</h2>
+
+				<a href="@Model.MailtoUrl" class="btn btn-outline-primary mb-3">Reply by e-mail</a>
+
+				@if (Model.CanBeHandled)
+				{
+					<div class="d-flex flex-wrap gap-2 mb-3">
+						<form asp-action="Accept" asp-route-id="@Model.Id" method="post">
+							<input type="hidden" name="rowVersion" value="@Model.RowVersion" />
+							<button type="submit" class="btn btn-primary">Accept</button>
+						</form>
+						<form asp-action="Decline" asp-route-id="@Model.Id" method="post">
+							<input type="hidden" name="rowVersion" value="@Model.RowVersion" />
+							<button type="submit" class="btn btn-outline-secondary">Decline</button>
+						</form>
+					</div>
+				}
+
+				@if (Model.CanMarkFigureAsSold)
+				{
+					<div class="mb-3">
+						<a asp-controller="Minifigures" asp-action="MarkAsSold" asp-route-id="@Model.MinifigureId"
+						   asp-route-price="@Model.OfferedPrice" class="btn btn-outline-primary">Mark figure as sold</a>
+					</div>
+				}
+
+				<a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+			</div>
+		</div>
+	</div>
+</div>

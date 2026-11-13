@@ -332,3 +332,19 @@ h1, .h1, h2, .h2 {
     height: 1px;
     overflow: hidden;
 }
+
+/*offer status badges*/
+.badge-offer-new {
+    background-color: var(--brick-red-fill);
+    color: #FFFFFF;
+}
+
+.badge-offer-accepted {
+    background-color: var(--brick-green-fill);
+    color: #FFFFFF;
+}
+
+.badge-offer-declined {
+    background-color: var(--brick-surface-muted);
+    color: var(--brick-ink);
+}

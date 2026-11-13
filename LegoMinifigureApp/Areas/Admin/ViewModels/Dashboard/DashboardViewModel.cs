@@ -10,18 +10,20 @@ namespace LegoMinifigureApp.Areas.Admin.ViewModels.Dashboard
         public int SoldCount { get; init; }
         public int TradedCount { get; init; }
         public IReadOnlyList<DashboardFigureViewModel> LatestFigures { get; init; } = [];
+        public int NewOffersCount { get; init; }
 
         public int ArchivedCount => SoldCount + TradedCount;
         public bool HasFigures => OwnedCount > 0;
 
-        public static DashboardViewModel From(DashboardSummaryDto dto) => new()
+        public static DashboardViewModel From(DashboardSummaryDto dto, int newOffersCount) => new()
         {
             OwnedCount = dto.OwnedCount,
             ForSaleCount = dto.ForSaleCount,
             ForTradeCount = dto.ForTradeCount,
             SoldCount = dto.SoldCount,
             TradedCount = dto.TradedCount,
-            LatestFigures = dto.LatestFigures.Select(DashboardFigureViewModel.From).ToList()
+            LatestFigures = dto.LatestFigures.Select(DashboardFigureViewModel.From).ToList(),
+            NewOffersCount = newOffersCount
         };
     }
 }
